@@ -1,0 +1,12 @@
+{
+  "name": "space-invaders",
+  "version": "0.1.0",
+  "description": "Space invaders",
+  "scripts": {},
+  "author": "Pau Fracés <pfraces@gmail.com",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^7.28.0",
+    "prettier": "^2.3.1"
+  }
+}
