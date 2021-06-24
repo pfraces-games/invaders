@@ -73,13 +73,14 @@ The code has been splitted in 3 files:
 
 **Design failures:**
 
+- [x] Avoid gameOver side effects from setState
+- [x] Avoid using setTimeout to render gameOver
+- [x] Hide elements outside canvas boundaries
 - [ ] Missing development environment (app server and bundler with support for modules)
 - [ ] Missing debug tools (fps graph and state viewer)
 - [ ] Missing a virtual dom engine to optimize memory usage and to fix mouse interacions
 - [ ] Replace components HOFs by providing the state needed by named props
 - [ ] Move life cycle from engine to game
-- [x] Avoid gameOver side effects from setState
-- [x] Avoid using setTimeout to render gameOver
 - [ ] Avoid checking for projectile overlap
 - [ ] Improve movement by using keydown and keyup events
 - [ ] Improve status bar buttons texts and visibility
