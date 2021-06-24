@@ -1,5 +1,5 @@
 (function () {
-  const { init, task, isRunning, setState } = engine;
+  const { isRunning, task, setState, addEffect, init } = engine;
   const { element, text } = hyperscript;
   const noop = function () {};
 
@@ -14,8 +14,8 @@
     cellHeight: '20px',
     invaderCols: 10,
     invaderRows: 3,
-    invadersVelocity: 500,
-    projectilesVelocity: 250
+    invadersVelocity: 450,
+    projectilesVelocity: 150
   };
 
   // ------------
@@ -105,19 +105,13 @@
         const { gridRows } = settings;
         const colEnd = gridRows - 1;
 
-        const isGameOver = state.invaders.some(function (invader) {
+        const invaderLanded = state.invaders.some(function (invader) {
           return invader.y === colEnd;
         });
 
-        if (isGameOver) {
-          setTimeout(function () {
-            task('stop');
-          }, 0);
-        }
-
         return {
           ...state,
-          isGameOver: state.isGameOver || isGameOver
+          isGameOver: state.isGameOver || invaderLanded
         };
       });
     };
@@ -245,17 +239,9 @@
 
     const updateGameState = function () {
       setState(function (state) {
-        const isGameOver = !state.invaders.length;
-
-        if (isGameOver) {
-          setTimeout(function () {
-            task('stop');
-          }, 0);
-        }
-
         return {
           ...state,
-          isGameOver: state.isGameOver || isGameOver
+          isGameOver: state.isGameOver || !state.invaders.length
         };
       });
     };
@@ -266,6 +252,16 @@
       updateGameState();
     };
   })();
+
+  // -------
+  // Effects
+  // -------
+
+  addEffect(function (state) {
+    if (state.isGameOver) {
+      task('stop');
+    }
+  });
 
   // ----------
   // Life Cycle

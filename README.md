@@ -78,8 +78,8 @@ The code has been splitted in 3 files:
 - [ ] Missing a virtual dom engine to optimize memory usage and to fix mouse interacions
 - [ ] Replace components HOFs by providing the state needed by named props
 - [ ] Move life cycle from engine to game
-- [ ] Avoid gameOver side effects from setState
-- [ ] Avoid using setTimeout to render gameOver
+- [x] Avoid gameOver side effects from setState
+- [x] Avoid using setTimeout to render gameOver
 - [ ] Avoid checking for projectile overlap
 - [ ] Improve movement by using keydown and keyup events
 - [ ] Improve status bar buttons texts and visibility

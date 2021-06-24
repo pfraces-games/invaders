@@ -42,6 +42,18 @@ const engine = (function () {
     currentState = transform(currentState);
   };
 
+  const effects = [];
+
+  const addEffect = function (effect) {
+    effects.push(effect);
+  };
+
+  const applyEffects = function () {
+    effects.forEach(function (effect) {
+      effect(currentState);
+    });
+  };
+
   const init = function ({
     root,
     initialState,
@@ -63,6 +75,7 @@ const engine = (function () {
 
       prevState = currentState;
       renderFrame();
+      applyEffects();
     };
 
     tasks.start = function () {
@@ -97,5 +110,5 @@ const engine = (function () {
     renderFrame();
   };
 
-  return { init, task, isRunning, setState };
+  return { isRunning, task, setState, addEffect, init };
 })();
