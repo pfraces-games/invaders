@@ -76,7 +76,7 @@ The code has been splitted in 3 files:
 - [x] Avoid gameOver side effects from setState
 - [x] Avoid using setTimeout to render gameOver
 - [x] Hide elements outside canvas boundaries
-- [ ] Missing development environment (app server and bundler with support for modules)
+- [x] Missing development environment (app server and bundler with support for modules)
 - [ ] Missing debug tools (fps graph and state viewer)
 - [ ] Missing a virtual dom engine to optimize memory usage and to fix mouse interacions
 - [ ] Replace components HOFs by providing the state needed by named props

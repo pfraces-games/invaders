@@ -1,114 +1,110 @@
-const engine = (function () {
-  const noop = function () {};
+const noop = function () {};
 
-  const status = {
-    notInitialized: 'notInitialized',
-    running: 'running',
-    stopped: 'stopped'
+const status = {
+  notInitialized: 'notInitialized',
+  running: 'running',
+  stopped: 'stopped'
+};
+
+let engineStatus = status.notInitialized;
+
+export const isRunning = function () {
+  return engineStatus === status.running;
+};
+
+const errNotInitialized = function () {
+  console.error('Not initialized');
+};
+
+const tasks = {
+  start: errNotInitialized,
+  stop: errNotInitialized,
+  reset: errNotInitialized
+};
+
+export const task = function (taskName) {
+  const taskFn = tasks[taskName];
+
+  if (!taskFn) {
+    console.error(`Task not defined: ${taskName}`);
+    return;
+  }
+
+  taskFn();
+};
+
+let currentState = null;
+let prevState = null;
+let rafId = null;
+
+export const setState = function (transform) {
+  currentState = transform(currentState);
+};
+
+const effects = [];
+
+export const addEffect = function (effect) {
+  effects.push(effect);
+};
+
+const applyEffects = function () {
+  effects.forEach(function (effect) {
+    effect(currentState);
+  });
+};
+
+export const init = function ({
+  root,
+  initialState,
+  render,
+  onStart = noop,
+  onStop = noop
+}) {
+  const renderFrame = function () {
+    root.innerHTML = '';
+    root.appendChild(render(currentState));
   };
 
-  let engineStatus = status.notInitialized;
+  const gameLoop = function () {
+    rafId = requestAnimationFrame(gameLoop);
 
-  const isRunning = function () {
-    return engineStatus === status.running;
-  };
-
-  const errNotInitialized = function () {
-    console.error('Not initialized');
-  };
-
-  const tasks = {
-    start: errNotInitialized,
-    stop: errNotInitialized,
-    reset: errNotInitialized
-  };
-
-  const task = function (taskName) {
-    const taskFn = tasks[taskName];
-
-    if (!taskFn) {
-      console.error(`Task not defined: ${taskName}`);
+    if (currentState === prevState) {
       return;
     }
 
-    taskFn();
+    prevState = currentState;
+    renderFrame();
+    applyEffects();
   };
 
-  let currentState = null;
-  let prevState = null;
-  let rafId = null;
+  tasks.start = function () {
+    if (isRunning()) {
+      return;
+    }
 
-  const setState = function (transform) {
-    currentState = transform(currentState);
+    engineStatus = status.running;
+    onStart();
+    gameLoop();
+    renderFrame();
   };
 
-  const effects = [];
-
-  const addEffect = function (effect) {
-    effects.push(effect);
+  tasks.stop = function () {
+    engineStatus = status.stopped;
+    onStop();
+    cancelAnimationFrame(rafId);
+    renderFrame();
   };
 
-  const applyEffects = function () {
-    effects.forEach(function (effect) {
-      effect(currentState);
-    });
-  };
+  tasks.reset = function () {
+    if (isRunning()) {
+      tasks.stop();
+    }
 
-  const init = function ({
-    root,
-    initialState,
-    render,
-    onStart = noop,
-    onStop = noop
-  }) {
-    const renderFrame = function () {
-      root.innerHTML = '';
-      root.appendChild(render(currentState));
-    };
-
-    const gameLoop = function () {
-      rafId = requestAnimationFrame(gameLoop);
-
-      if (currentState === prevState) {
-        return;
-      }
-
-      prevState = currentState;
-      renderFrame();
-      applyEffects();
-    };
-
-    tasks.start = function () {
-      if (isRunning()) {
-        return;
-      }
-
-      engineStatus = status.running;
-      onStart();
-      gameLoop();
-      renderFrame();
-    };
-
-    tasks.stop = function () {
-      engineStatus = status.stopped;
-      onStop();
-      cancelAnimationFrame(rafId);
-      renderFrame();
-    };
-
-    tasks.reset = function () {
-      if (isRunning()) {
-        tasks.stop();
-      }
-
-      prevState = null;
-      currentState = initialState();
-      renderFrame();
-    };
-
+    prevState = null;
     currentState = initialState();
     renderFrame();
   };
 
-  return { isRunning, task, setState, addEffect, init };
-})();
+  currentState = initialState();
+  renderFrame();
+};
