@@ -1,290 +1,288 @@
 (function () {
-  const canvas = document.querySelector('#canvas');
-  const startButton = document.querySelector('#start');
-  const pauseResumeButton = document.querySelector('#pause-resume');
-  const score = document.querySelector('#score');
+  const { init, task, isRunning, setState } = engine;
+  const { element, text } = hyperscript;
+  const noop = function () {};
+
+  // --------
+  // Settings
+  // --------
 
   const settings = {
-    gridWidth: 15,
-    gridHeight: 15,
-    rowInvadersQty: 10,
+    gridCols: 15,
+    gridRows: 15,
+    cellWidth: '20px',
+    cellHeight: '20px',
+    invaderCols: 10,
     invaderRows: 3,
-    refreshRate: 100,
-    invaderVelocity: 600,
-    projectileVelocity: 200
+    invadersVelocity: 500,
+    projectilesVelocity: 250
   };
 
-  let state = {};
-  const intervalIds = [];
+  // ------------
+  // Key Bindings
+  // ------------
 
-  const resetState = function () {
-    state = {
-      isRunning: false,
-      isGameOver: false,
-      cells: [],
-      invaders: [],
-      defender: null,
-      projectiles: [],
-      invadersDirection: { x: 1, y: 0 }
-    };
-  };
+  const keyBindings = (function () {
+    const moveDefenderLeft = function () {
+      const rowStart = 0;
 
-  const initCells = function () {
-    state.cells = [];
-    const totalCells = settings.gridWidth * settings.gridHeight;
+      setState(function (state) {
+        if (state.defender.x === rowStart) {
+          return state;
+        }
 
-    for (let i = 0; i < totalCells; i++) {
-      const cell = document.createElement('div');
-      cell.classList.add('cell');
-      state.cells.push(cell);
-    }
-  };
-
-  const initInvaders = function () {
-    state.invaders = [];
-    const invadersQty = settings.rowInvadersQty * settings.invaderRows;
-
-    for (let i = 0; i < invadersQty; i++) {
-      const invaderElement = document.createElement('div');
-      invaderElement.classList.add('invader');
-
-      state.invaders.push({
-        element: invaderElement,
-        x: i % settings.rowInvadersQty,
-        y: Math.floor(i / settings.rowInvadersQty)
+        return {
+          ...state,
+          defender: {
+            ...state.defender,
+            x: state.defender.x - 1
+          }
+        };
       });
-    }
-  };
-
-  const initDefender = function () {
-    const defenderElement = document.createElement('div');
-    defenderElement.classList.add('defender');
-
-    state.defender = {
-      element: defenderElement,
-      x: Math.ceil(settings.gridWidth / 2) - 1,
-      y: settings.gridHeight - 1
-    };
-  };
-
-  const checkCollisions = function () {
-    const collisions = [];
-
-    state.projectiles.forEach(function (projectile) {
-      const invaderCollision = state.invaders.find(function (invader) {
-        return invader.x === projectile.x && invader.y === projectile.y;
-      });
-
-      if (invaderCollision) {
-        collisions.push({
-          x: invaderCollision.x,
-          y: invaderCollision.y
-        });
-      }
-
-      if (projectile.y < 0) {
-        collisions.push({
-          x: projectile.x,
-          y: projectile.y
-        });
-      }
-    });
-
-    state.invaders.forEach(function (invader) {
-      if (invader.x === state.defender.x && invader.y === state.defender.y) {
-        collisions.push({
-          x: invader.x,
-          y: invader.y
-        });
-
-        state.defender.element.classList.add('dead');
-        gameOver();
-      }
-
-      if (invader.y === settings.gridHeight - 1) {
-        invader.element.classList.add('landed');
-        gameOver();
-      }
-    });
-
-    collisions.forEach(function (collision) {
-      state.invaders = state.invaders.filter(function (invader) {
-        return invader.x !== collision.x || invader.y !== collision.y;
-      });
-
-      state.projectiles = state.projectiles.filter(function (projectile) {
-        return projectile.x !== collision.x || projectile.y !== collision.y;
-      });
-    });
-  };
-
-  const renderScore = function () {
-    const invadersQty = settings.rowInvadersQty * settings.invaderRows;
-    score.innerHTML = `Score: ${invadersQty - state.invaders.length}`;
-  };
-
-  const renderCells = function () {
-    state.cells.forEach(function (cell) {
-      canvas.appendChild(cell);
-    });
-  };
-
-  const renderInvaders = function () {
-    state.invaders.forEach(function (invader) {
-      const cellIndex = settings.gridWidth * invader.y + invader.x;
-      state.cells[cellIndex].appendChild(invader.element);
-    });
-  };
-
-  const renderDefender = function () {
-    const defender = state.defender;
-    const cellIndex = settings.gridWidth * defender.y + defender.x;
-    state.cells[cellIndex].appendChild(defender.element);
-  };
-
-  const renderProjectiles = function () {
-    state.projectiles.forEach(function (projectile) {
-      const cellIndex = settings.gridWidth * projectile.y + projectile.x;
-      state.cells[cellIndex].appendChild(projectile.element);
-    });
-  };
-
-  const render = function () {
-    canvas.innerHTML = '';
-    initCells();
-    checkCollisions();
-
-    renderScore();
-    renderCells();
-    renderInvaders();
-    renderDefender();
-    renderProjectiles();
-  };
-
-  const getLeftMostInvader = function () {
-    return state.invaders.reduce(function (acc, invader) {
-      return invader.x < acc.x ? invader : acc;
-    });
-  };
-
-  const getRightMostInvader = function () {
-    return state.invaders.reduce(function (acc, invader) {
-      return invader.x > acc.x ? invader : acc;
-    });
-  };
-
-  const updateInvadersDirection = function () {
-    const rowStart = 0;
-    const rowEnd = settings.gridWidth - 1;
-    const leftMostInvader = getLeftMostInvader();
-    const rightMostInvader = getRightMostInvader();
-
-    if (state.invadersDirection.y === 1) {
-      state.invadersDirection = {
-        x: leftMostInvader.x === rowStart ? 1 : -1,
-        y: 0
-      };
-      return;
-    }
-
-    if (
-      (rightMostInvader.x === rowEnd && state.invadersDirection.x === 1) ||
-      (leftMostInvader.x === rowStart && state.invadersDirection.x === -1)
-    ) {
-      state.invadersDirection = { x: 0, y: 1 };
-      return;
-    }
-  };
-
-  const updateInvadersPosition = function () {
-    state.invaders.forEach(function (invader) {
-      invader.x += state.invadersDirection.x;
-      invader.y += state.invadersDirection.y;
-    });
-  };
-
-  const updateProjectilesPosition = function () {
-    state.projectiles.forEach(function (projectile) {
-      projectile.y -= 1;
-    });
-  };
-
-  const moveDefenderLeft = function () {
-    const rowStart = 0;
-
-    if (state.defender.x > rowStart) {
-      state.defender.x -= 1;
-    }
-  };
-
-  const moveDefenderRight = function () {
-    const rowEnd = settings.gridWidth - 1;
-
-    if (state.defender.x < rowEnd) {
-      state.defender.x += 1;
-    }
-  };
-
-  const fire = function () {
-    const projectileCoords = {
-      x: state.defender.x,
-      y: state.defender.y - 1
     };
 
-    const projectileOverlap = state.projectiles.find(function (projectile) {
-      return (
-        projectile.x === projectileCoords.x &&
-        projectile.y === projectileCoords.y
-      );
-    });
+    const moveDefenderRight = function () {
+      setState(function (state) {
+        const { gridCols } = settings;
+        const rowEnd = gridCols - 1;
 
-    if (projectileOverlap) {
-      return;
-    }
+        if (state.defender.x === rowEnd) {
+          return state;
+        }
 
-    const element = document.createElement('div');
-    element.classList.add('projectile');
+        return {
+          ...state,
+          defender: {
+            ...state.defender,
+            x: state.defender.x + 1
+          }
+        };
+      });
+    };
 
-    state.projectiles.push({
-      element,
-      ...projectileCoords
-    });
-  };
+    const fire = function () {
+      setState(function (state) {
+        const newProjectile = {
+          x: state.defender.x,
+          y: state.defender.y - 1
+        };
 
-  const initState = function () {
-    resetState();
-    initCells();
-    initInvaders();
-    initDefender();
-  };
+        const projectileOverlap = state.projectiles.find(function (projectile) {
+          return (
+            projectile.x === newProjectile.x && projectile.y === newProjectile.y
+          );
+        });
+
+        if (projectileOverlap) {
+          return state;
+        }
+
+        return {
+          ...state,
+          projectiles: [...state.projectiles, newProjectile]
+        };
+      });
+    };
+
+    return {
+      ArrowLeft: moveDefenderLeft,
+      ArrowRight: moveDefenderRight,
+      ArrowUp: fire
+    };
+  })();
 
   const onKeyDown = function (event) {
-    const key = event.key;
-
-    if (key === 'ArrowLeft') {
-      moveDefenderLeft();
-      return;
-    }
-
-    if (key === 'ArrowRight') {
-      moveDefenderRight();
-      return;
-    }
-
-    if (key === 'ArrowUp') {
-      fire();
-      return;
-    }
+    (keyBindings[event.key] || noop)();
   };
 
-  const init = function () {
-    initState();
-    render();
+  // ----------
+  // Animations
+  // ----------
+
+  const animateInvaders = (function () {
+    const processInvadersCollision = function () {
+      setState(function (state) {
+        const { gridRows } = settings;
+        const colEnd = gridRows - 1;
+
+        const isGameOver = state.invaders.some(function (invader) {
+          return invader.y === colEnd;
+        });
+
+        if (isGameOver) {
+          setTimeout(function () {
+            task('stop');
+          }, 0);
+        }
+
+        return {
+          ...state,
+          isGameOver: state.isGameOver || isGameOver
+        };
+      });
+    };
+
+    const getLeftMostInvader = function (state) {
+      return state.invaders.reduce(function (acc, invader) {
+        return invader.x < acc.x ? invader : acc;
+      });
+    };
+
+    const getRightMostInvader = function (state) {
+      return state.invaders.reduce(function (acc, invader) {
+        return invader.x > acc.x ? invader : acc;
+      });
+    };
+
+    const updateInvadersDirection = function () {
+      const { gridCols } = settings;
+      const rowStart = 0;
+      const rowEnd = gridCols - 1;
+
+      setState(function (state) {
+        const leftMostInvader = getLeftMostInvader(state);
+        const rightMostInvader = getRightMostInvader(state);
+
+        if (state.invadersDirection.y === 1) {
+          return {
+            ...state,
+            invadersDirection: {
+              x: leftMostInvader.x === rowStart ? 1 : -1,
+              y: 0
+            }
+          };
+        }
+
+        if (
+          (rightMostInvader.x === rowEnd && state.invadersDirection.x === 1) ||
+          (leftMostInvader.x === rowStart && state.invadersDirection.x === -1)
+        ) {
+          return {
+            ...state,
+            invadersDirection: { x: 0, y: 1 }
+          };
+        }
+
+        return state;
+      });
+    };
+
+    const updateInvadersPosition = function () {
+      setState(function (state) {
+        return {
+          ...state,
+          invaders: state.invaders.map(function (invader) {
+            return {
+              x: invader.x + state.invadersDirection.x,
+              y: invader.y + state.invadersDirection.y
+            };
+          })
+        };
+      });
+    };
+
+    return function () {
+      processInvadersCollision();
+      updateInvadersDirection();
+      updateInvadersPosition();
+    };
+  })();
+
+  const animateProjectiles = (function () {
+    const processProjectilesCollision = function () {
+      setState(function (state) {
+        const collisions = [];
+
+        state.projectiles.forEach(function (projectile) {
+          const collision = state.invaders.find(function (invader) {
+            return invader.x === projectile.x && invader.y === projectile.y;
+          });
+
+          if (collision) {
+            collisions.push({
+              x: collision.x,
+              y: collision.y
+            });
+          }
+        });
+
+        return {
+          ...state,
+          score: state.score + collisions.length,
+          projectiles: state.projectiles
+            .filter(function (projectile) {
+              return projectile.y > 0;
+            })
+            .filter(function (projectile) {
+              return !collisions.find(function (collision) {
+                return (
+                  projectile.x === collision.x && projectile.y === collision.y
+                );
+              });
+            }),
+          invaders: state.invaders.filter(function (invader) {
+            return !collisions.find(function (collision) {
+              return invader.x === collision.x && invader.y === collision.y;
+            });
+          })
+        };
+      });
+    };
+
+    const updateProjectilesPosition = function () {
+      setState(function (state) {
+        return {
+          ...state,
+          projectiles: state.projectiles.map(function (projectile) {
+            return {
+              ...projectile,
+              y: projectile.y - 1
+            };
+          })
+        };
+      });
+    };
+
+    const updateGameState = function () {
+      setState(function (state) {
+        const isGameOver = !state.invaders.length;
+
+        if (isGameOver) {
+          setTimeout(function () {
+            task('stop');
+          }, 0);
+        }
+
+        return {
+          ...state,
+          isGameOver: state.isGameOver || isGameOver
+        };
+      });
+    };
+
+    return function () {
+      processProjectilesCollision();
+      updateProjectilesPosition();
+      updateGameState();
+    };
+  })();
+
+  // ----------
+  // Life Cycle
+  // ----------
+
+  const intervalIds = [];
+
+  const onStart = function () {
+    const { invadersVelocity, projectilesVelocity } = settings;
+
+    document.addEventListener('keydown', onKeyDown);
+
+    intervalIds.push(setInterval(animateInvaders, invadersVelocity));
+    intervalIds.push(setInterval(animateProjectiles, projectilesVelocity));
   };
 
-  const pause = function () {
-    state.isRunning = false;
-
+  const onStop = function () {
     document.removeEventListener('keydown', onKeyDown);
 
     intervalIds.forEach(function (intervalId) {
@@ -292,65 +290,191 @@
     });
   };
 
-  const run = function () {
-    state.isRunning = true;
+  // ----------------
+  // Render Functions
+  // ----------------
 
-    document.addEventListener('keydown', onKeyDown);
+  const startButton = function () {
+    const onClick = function () {
+      task('start');
+    };
 
-    intervalIds.push(
-      setInterval(function () {
-        if (!state.invaders.length) {
-          gameOver();
-          return;
+    return element('button', {
+      eventListeners: { click: onClick },
+      childNodes: [text('Start')]
+    });
+  };
+
+  const pauseButton = function () {
+    const onClick = function () {
+      task('stop');
+    };
+
+    return element('button', {
+      eventListeners: { click: onClick },
+      childNodes: [text('Pause')]
+    });
+  };
+
+  const resetButton = function () {
+    const onClick = function () {
+      task('reset');
+    };
+
+    return element('button', {
+      eventListeners: { click: onClick },
+      childNodes: [text('Reset')]
+    });
+  };
+
+  const score = function (state) {
+    return element('div', {
+      classList: ['score'],
+      childNodes: [text(`Score: ${state.score}`)]
+    });
+  };
+
+  const statusBar = function (state) {
+    return element('div', {
+      classList: ['status-bar'],
+      childNodes: [
+        isRunning() ? pauseButton() : startButton(),
+        resetButton(),
+        score(state)
+      ]
+    });
+  };
+
+  const cell = function () {
+    return element('div', {
+      classList: ['cell']
+    });
+  };
+
+  const gridLayer = function () {
+    const { gridCols, gridRows } = settings;
+
+    return element('div', {
+      classList: ['grid-layer'],
+      childNodes: [...Array(gridCols * gridRows)].map(cell)
+    });
+  };
+
+  const invader = function (invaderState) {
+    return function () {
+      const { cellWidth, cellHeight } = settings;
+
+      return element('div', {
+        classList: ['invader'],
+        styles: {
+          left: `calc(${invaderState.x} * ${cellWidth})`,
+          top: `calc(${invaderState.y} * ${cellHeight})`
         }
-
-        updateInvadersDirection();
-        updateInvadersPosition();
-      }, settings.invaderVelocity)
-    );
-
-    intervalIds.push(
-      setInterval(function () {
-        updateProjectilesPosition();
-      }, settings.projectileVelocity)
-    );
-
-    intervalIds.push(setInterval(render, settings.refreshRate));
+      });
+    };
   };
 
-  const start = function () {
-    if (state.isRunning) {
-      pause();
-    }
+  const projectile = function (projectileState) {
+    return function () {
+      const { cellWidth, cellHeight } = settings;
 
-    init();
-    run();
+      return element('div', {
+        classList: ['projectile'],
+        styles: {
+          left: `calc(${projectileState.x} * ${cellWidth})`,
+          top: `calc(${projectileState.y} * ${cellHeight})`
+        }
+      });
+    };
   };
 
-  const pauseResume = function () {
-    if (state.isGameOver) {
-      return;
-    }
+  const defender = function (state) {
+    const { cellWidth, cellHeight } = settings;
 
-    state.isRunning ? pause() : run();
+    return element('div', {
+      classList: ['defender'],
+      styles: {
+        left: `calc(${state.defender.x} * ${cellWidth})`,
+        top: `calc(${state.defender.y} * ${cellHeight})`
+      }
+    });
   };
 
-  const gameOver = function () {
-    if (state.isGameOver) {
-      return;
-    }
+  const actionLayer = function (state) {
+    const invaders = state.invaders.map(function (invaderState) {
+      return invader(invaderState)();
+    });
 
-    pause();
-    state.isGameOver = true;
+    const projectiles = state.projectiles.map(function (projectileState) {
+      return projectile(projectileState)();
+    });
 
-    const backdrop = document.createElement('div');
-    backdrop.classList.add('game-over');
-    backdrop.innerHTML = state.invaders.length ? 'Game Over' : 'You Win';
-    canvas.appendChild(backdrop);
+    return element('div', {
+      classList: ['action-layer'],
+      childNodes: [...invaders, ...projectiles, defender(state)]
+    });
   };
 
-  startButton.addEventListener('click', start);
-  pauseResumeButton.addEventListener('click', pauseResume);
+  const gameOverLayer = function (state) {
+    return element('div', {
+      classList: ['game-over-layer'],
+      childNodes: [text(state.invaders.length ? 'Game Over' : 'You Win')]
+    });
+  };
 
-  init();
+  const board = function (state) {
+    return element('div', {
+      classList: ['board'],
+      childNodes: [
+        gridLayer(state),
+        actionLayer(state),
+        state.isGameOver && gameOverLayer(state)
+      ]
+    });
+  };
+
+  const canvas = function (state) {
+    return element('div', {
+      classList: ['canvas'],
+      childNodes: [statusBar(state), board(state)]
+    });
+  };
+
+  // --------------
+  // Initialization
+  // --------------
+
+  const initialState = function () {
+    const { gridCols, gridRows, invaderRows, invaderCols } = settings;
+    const colEnd = gridRows - 1;
+
+    return {
+      score: 0,
+      isGameOver: false,
+      defender: {
+        x: Math.ceil(gridCols / 2) - 1,
+        y: colEnd
+      },
+      projectiles: [],
+      invadersDirection: {
+        x: 1,
+        y: 0
+      },
+      invaders: [...Array(invaderRows)]
+        .map(function (row, rowIndex) {
+          return [...Array(invaderCols)].map(function (col, colIndex) {
+            return { x: colIndex, y: rowIndex };
+          });
+        })
+        .flat()
+    };
+  };
+
+  init({
+    root: document.querySelector('#root'),
+    initialState,
+    render: canvas,
+    onStart,
+    onStop
+  });
 })();

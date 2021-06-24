@@ -22,27 +22,66 @@ Let's see it goes for us.
 
 Let's begin!
 
-## Retrospective
+### Retrospective
 
 Game is finally complete! It took **6 hours** of development with **346 LOC**.
 
-Additional features:
+**Additional features:**
 
 - Move remaining invaders to the edges of the canvas
 - Start and pause / resume buttons
 - Game over overlay
 
-### Design failures
+**Design failures:**
 
-- Collision detection has some issues due to the async nature of the state updates
-- Collision detection design and performance can be improved
-- Render functions are not pure
-- Game engine is spreaded all over the game code
-- State updates mixed mutations with immutable updates
-- Missing unified game loop
-- Missing rendering updates as soon as possible by using `requestAnimationFrame`
-- Collision detection is domain specific
-- Status bar should be included in the render pipeline
-- Missing `editorConfig` and `eslint` settings decreases development time
-- Ania's approach to use DOM classes instead of state was not optimal for game
-  development but allow her to simplify the implementation
+- [x] Missing `editorConfig` and `eslint` settings decreases development time
+- [x] Render functions are not pure
+- [x] Status bar should be included in the render pipeline
+- [x] Tiles positioning should be simplified using `position: absolute`
+- [x] State updates mixed mutations with immutable updates
+- [x] Missing rendering updates as soon as possible by using `requestAnimationFrame`
+- [x] Game engine is spreaded all over the code
+- [ ] Collision detection issues due to the async nature of the state updates
+- [ ] Collision detection is domain specific
+- [ ] Collision detection is spreaded all over the code
+- [ ] Missing unified game loop
+
+## 2nd exercise
+
+In this case I want to change the implementation by fixing the design failures
+found in the 1st exercise. This time I don't want to do a speed coding session.
+Instead I want to implement a React-like render and some sort of game engine.
+
+### Retrospective
+
+Game is finally complete! I've removed the invader landing and defender dead
+styles for simplicity of implementation. The only check for game over is for the
+invader to reach the last column.
+
+The code has been splitted in 3 files:
+
+- hyperscript.js with 42 LOC
+- game-engine.js with 101 LOC
+- app.js with 480 LOC
+
+**Pending design failures (from previous implementation):**
+
+- [ ] Collision detection issues due to the async nature of the state updates
+- [ ] Collision detection is domain specific
+- [ ] Collision detection is spreaded all over the code
+- [ ] Missing unified game loop
+
+**Design failures:**
+
+- [ ] Missing development environment (app server and bundler with support for modules)
+- [ ] Missing debug tools (fps graph and state viewer)
+- [ ] Missing a virtual dom engine to optimize memory usage and to fix mouse interacions
+- [ ] Replace components HOFs by providing the state needed by named props
+- [ ] Move life cycle from engine to game
+- [ ] Avoid gameOver side effects from setState
+- [ ] Avoid using setTimeout to render gameOver
+- [ ] Avoid checking for projectile overlap
+- [ ] Improve movement by using keydown and keyup events
+- [ ] Improve status bar buttons texts and visibility
+- [ ] (Optional) State selectors and partial state updates
+- [ ] (Optional) Use reactivity to control component updates

@@ -1,21 +1,26 @@
-#status-bar {
+.status-bar {
   width: 300px;
   display: flex;
+  margin-bottom: 10px;
 }
 
-#score {
+.score {
   margin: 0;
   margin-left: auto;
   width: 65px;
 }
 
-#canvas {
+.board {
   position: relative;
-  display: flex;
-  flex-wrap: wrap;
   width: 300px;
   height: 300px;
   border: 1px solid black;
+}
+
+.grid-layer {
+  position: absolute;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .cell {
@@ -26,36 +31,38 @@
   border: 1px solid white;
 }
 
+.action-layer {
+  position: absolute;
+}
+
 .invader {
+  position: absolute;
+  margin: 1px;
   width: 18px;
   height: 18px;
   border-radius: 9px;
   background-color: purple;
 }
 
-.invader.landed {
-  background-color: red;
-}
-
 .defender {
+  position: absolute;
+  margin: 1px;
   width: 18px;
   height: 18px;
   border-radius: 9px;
   background-color: blue;
 }
 
-.defender.dead {
-  background-color: red;
-}
-
 .projectile {
-  width: 18px;
+  position: absolute;
+  margin: 1px 7px;
+  width: 6px;
   height: 18px;
   border-radius: 9px;
   background-color: yellow;
 }
 
-.game-over {
+.game-over-layer {
   position: absolute;
   width: 100%;
   height: 100%;
