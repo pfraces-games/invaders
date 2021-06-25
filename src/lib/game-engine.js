@@ -1,10 +1,4 @@
-const noop = function () {};
-
-const constant = function (value) {
-  return function () {
-    return value;
-  };
-};
+import { noop, constant } from './fp';
 
 const status = {
   notInitialized: 'notInitialized',

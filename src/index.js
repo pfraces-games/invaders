@@ -6,11 +6,10 @@ import {
   addCollider,
   addEffect,
   init
-} from './game-engine';
+} from './lib/game-engine';
 
-import { element, text } from './hyperscript';
-
-const noop = function () {};
+import { element, text } from './lib/hyperscript';
+import { noop } from './lib/fp';
 
 // --------
 // Settings
