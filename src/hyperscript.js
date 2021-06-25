@@ -1,9 +1,9 @@
 export const element = function (tagName, options = {}) {
   const node = document.createElement(tagName);
 
-  if (options.props) {
-    for (let prop in options.props) {
-      node[prop] = options.props[prop];
+  if (options.attrs) {
+    for (let attr in options.attrs) {
+      node[attr] = options.attrs[attr];
     }
   }
 

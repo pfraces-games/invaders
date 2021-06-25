@@ -66,10 +66,10 @@ The code has been splitted in 3 files:
 
 **Pending design failures (from previous implementation):**
 
-- [ ] Collision detection issues due to the async nature of the state updates
-- [ ] Collision detection is domain specific
-- [ ] Collision detection is spreaded all over the code
-- [ ] Missing unified game loop
+- [x] Missing unified game loop
+- [x] Collision detection is domain specific
+- [x] Collision detection is spreaded all over the code
+- [x] Collision detection issues due to the async nature of the state updates
 
 **Design failures:**
 
@@ -77,12 +77,19 @@ The code has been splitted in 3 files:
 - [x] Avoid using setTimeout to render gameOver
 - [x] Hide elements outside canvas boundaries
 - [x] Missing development environment (app server and bundler with support for modules)
-- [ ] Missing debug tools (fps graph and state viewer)
-- [ ] Missing a virtual dom engine to optimize memory usage and to fix mouse interacions
-- [ ] Replace components HOFs by providing the state needed by named props
+- [x] (Bug) Killing leftmost invaders when they are moving down from leftmost position
+- [x] Remove state diff optimization
+- [x] Velocity as a function of state
+- [ ] Game engine single export: `init((deps) => config)`
 - [ ] Move life cycle from engine to game
-- [ ] Avoid checking for projectile overlap
+- [ ] Add virtual dom to optimize memory usage and to fix mouse interacions
+- [ ] Replace components HOFs by providing the state needed by named props
+- [ ] Add component memoization
 - [ ] Improve movement by using keydown and keyup events
 - [ ] Improve status bar buttons texts and visibility
-- [ ] (Optional) State selectors and partial state updates
+- [ ] Improve collisions: Killed invaders having other invaders underneath
+  - Enities with `{ render, updatePosition, colliders }` methods
+  - Manage decimal positions in colliders rounded to integers in grid cells
+- [ ] (Optional) Debug tools: fps graph and state viewer
+- [ ] (Optional) State selectors `getState((state) => selector)` and partial state updates
 - [ ] (Optional) Use reactivity to control component updates

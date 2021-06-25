@@ -1,5 +1,15 @@
-import { isRunning, task, setState, addEffect, init } from './game-engine';
+import {
+  isRunning,
+  task,
+  setState,
+  addAnimation,
+  addCollider,
+  addEffect,
+  init
+} from './game-engine';
+
 import { element, text } from './hyperscript';
+
 const noop = function () {};
 
 // --------
@@ -13,8 +23,10 @@ const settings = {
   cellHeight: '20px',
   invaderCols: 10,
   invaderRows: 3,
-  invadersVelocity: 450,
-  projectilesVelocity: 150
+  invadersMinVelocity: 50,
+  invadersIncrementVelocity: 15,
+  projectilesVelocity: 100,
+  minDistanceBetweenProjectiles: 2
 };
 
 // ------------
@@ -68,7 +80,8 @@ const keyBindings = (function () {
 
       const projectileOverlap = state.projectiles.find(function (projectile) {
         return (
-          projectile.x === newProjectile.x && projectile.y === newProjectile.y
+          newProjectile.y - projectile.y <=
+          settings.minDistanceBetweenProjectiles
         );
       });
 
@@ -98,159 +111,160 @@ const onKeyDown = function (event) {
 // Animations
 // ----------
 
-const animateInvaders = (function () {
-  const processInvadersCollision = function () {
-    setState(function (state) {
-      const { gridRows } = settings;
-      const colEnd = gridRows - 1;
-
-      const invaderLanded = state.invaders.some(function (invader) {
-        return invader.y === colEnd;
-      });
-
-      return {
-        ...state,
-        isGameOver: state.isGameOver || invaderLanded
-      };
-    });
-  };
-
-  const getLeftMostInvader = function (state) {
-    return state.invaders.reduce(function (acc, invader) {
-      return invader.x < acc.x ? invader : acc;
-    });
-  };
-
-  const getRightMostInvader = function (state) {
-    return state.invaders.reduce(function (acc, invader) {
-      return invader.x > acc.x ? invader : acc;
-    });
-  };
-
-  const updateInvadersDirection = function () {
-    const { gridCols } = settings;
-    const rowStart = 0;
-    const rowEnd = gridCols - 1;
-
-    setState(function (state) {
-      const leftMostInvader = getLeftMostInvader(state);
-      const rightMostInvader = getRightMostInvader(state);
-
-      if (state.invadersDirection.y === 1) {
+const invadersAnimation = function () {
+  setState(function (state) {
+    return {
+      ...state,
+      invaders: state.invaders.map(function (invader) {
         return {
-          ...state,
-          invadersDirection: {
-            x: leftMostInvader.x === rowStart ? 1 : -1,
-            y: 0
-          }
+          ...invader,
+          x: invader.x + state.invadersDirection
         };
-      }
+      })
+    };
+  });
+};
 
-      if (
-        (rightMostInvader.x === rowEnd && state.invadersDirection.x === 1) ||
-        (leftMostInvader.x === rowStart && state.invadersDirection.x === -1)
-      ) {
+const invadersVelocity = function (state) {
+  const {
+    invaderCols,
+    invaderRows,
+    invadersMinVelocity,
+    invadersIncrementVelocity
+  } = settings;
+
+  const invadersLength = state
+    ? state.invaders.length
+    : invaderCols * invaderRows;
+
+  return invadersMinVelocity + invadersLength * invadersIncrementVelocity;
+};
+
+const projectilesAnimation = function () {
+  setState(function (state) {
+    return {
+      ...state,
+      projectiles: state.projectiles.map(function (projectile) {
         return {
-          ...state,
-          invadersDirection: { x: 0, y: 1 }
+          ...projectile,
+          y: projectile.y - 1
         };
-      }
+      })
+    };
+  });
+};
 
-      return state;
-    });
-  };
+const { projectilesVelocity } = settings;
 
-  const updateInvadersPosition = function () {
-    setState(function (state) {
+addAnimation({ update: invadersAnimation, velocity: invadersVelocity });
+addAnimation({ update: projectilesAnimation, velocity: projectilesVelocity });
+
+// ---------
+// Colliders
+// ---------
+
+const invadersOutOfBounds = function (state) {
+  const { gridCols } = settings;
+  const rowStart = 0;
+  const rowEnd = gridCols - 1;
+
+  if (!state.invaders.length) {
+    return state;
+  }
+
+  const leftMostInvader = state.invaders.reduce(function (acc, invader) {
+    return invader.x < acc.x ? invader : acc;
+  });
+
+  const rightMostInvader = state.invaders.reduce(function (acc, invader) {
+    return invader.x > acc.x ? invader : acc;
+  });
+
+  let invadersDirection = state.invadersDirection;
+  let invaders = state.invaders;
+
+  if (rightMostInvader.x > rowEnd || leftMostInvader.x < rowStart) {
+    invadersDirection *= -1;
+
+    invaders = invaders.map(function (invader) {
       return {
-        ...state,
-        invaders: state.invaders.map(function (invader) {
-          return {
-            x: invader.x + state.invadersDirection.x,
-            y: invader.y + state.invadersDirection.y
-          };
-        })
+        x: invader.x + invadersDirection,
+        y: invader.y + 1
       };
     });
+  }
+
+  return {
+    ...state,
+    invadersDirection,
+    invaders
   };
+};
 
-  return function () {
-    processInvadersCollision();
-    updateInvadersDirection();
-    updateInvadersPosition();
+const invadersLandingCollider = function (state) {
+  const { gridRows } = settings;
+  const colEnd = gridRows - 1;
+
+  const invaderLanded = state.invaders.some(function (invader) {
+    return invader.y === colEnd;
+  });
+
+  return {
+    ...state,
+    isGameOver: state.isGameOver || invaderLanded
   };
-})();
+};
 
-const animateProjectiles = (function () {
-  const processProjectilesCollision = function () {
-    setState(function (state) {
-      const collisions = [];
+const projectileLostCollider = function (state) {
+  return {
+    ...state,
+    projectiles: state.projectiles.filter(function (projectile) {
+      return projectile.y >= 0;
+    })
+  };
+};
 
-      state.projectiles.forEach(function (projectile) {
-        const collision = state.invaders.find(function (invader) {
-          return invader.x === projectile.x && invader.y === projectile.y;
-        });
+const projectileHitCollider = function (state) {
+  const collisions = [];
 
-        if (collision) {
-          collisions.push({
-            x: collision.x,
-            y: collision.y
-          });
-        }
+  state.projectiles.forEach(function (projectile) {
+    const collidedInvader = state.invaders.find(function (invader) {
+      return invader.x === projectile.x && invader.y === projectile.y;
+    });
+
+    if (collidedInvader) {
+      collisions.push({
+        x: collidedInvader.x,
+        y: collidedInvader.y
       });
+    }
+  });
 
-      return {
-        ...state,
-        score: state.score + collisions.length,
-        projectiles: state.projectiles
-          .filter(function (projectile) {
-            return projectile.y > 0;
-          })
-          .filter(function (projectile) {
-            return !collisions.find(function (collision) {
-              return (
-                projectile.x === collision.x && projectile.y === collision.y
-              );
-            });
-          }),
-        invaders: state.invaders.filter(function (invader) {
-          return !collisions.find(function (collision) {
-            return invader.x === collision.x && invader.y === collision.y;
-          });
-        })
-      };
+  const projectiles = state.projectiles.filter(function (projectile) {
+    return !collisions.find(function (collision) {
+      return projectile.x === collision.x && projectile.y === collision.y;
     });
-  };
+  });
 
-  const updateProjectilesPosition = function () {
-    setState(function (state) {
-      return {
-        ...state,
-        projectiles: state.projectiles.map(function (projectile) {
-          return {
-            ...projectile,
-            y: projectile.y - 1
-          };
-        })
-      };
+  const invaders = state.invaders.filter(function (invader) {
+    return !collisions.find(function (collision) {
+      return invader.x === collision.x && invader.y === collision.y;
     });
-  };
+  });
 
-  const updateGameState = function () {
-    setState(function (state) {
-      return {
-        ...state,
-        isGameOver: state.isGameOver || !state.invaders.length
-      };
-    });
+  return {
+    ...state,
+    score: state.score + collisions.length,
+    isGameOver: state.isGameOver || !invaders.length,
+    projectiles,
+    invaders
   };
+};
 
-  return function () {
-    processProjectilesCollision();
-    updateProjectilesPosition();
-    updateGameState();
-  };
-})();
+addCollider(invadersOutOfBounds);
+addCollider(invadersLandingCollider);
+addCollider(projectileLostCollider);
+addCollider(projectileHitCollider);
 
 // -------
 // Effects
@@ -266,23 +280,12 @@ addEffect(function (state) {
 // Life Cycle
 // ----------
 
-const intervalIds = [];
-
 const onStart = function () {
-  const { invadersVelocity, projectilesVelocity } = settings;
-
   document.addEventListener('keydown', onKeyDown);
-
-  intervalIds.push(setInterval(animateInvaders, invadersVelocity));
-  intervalIds.push(setInterval(animateProjectiles, projectilesVelocity));
 };
 
 const onStop = function () {
   document.removeEventListener('keydown', onKeyDown);
-
-  intervalIds.forEach(function (intervalId) {
-    clearInterval(intervalId);
-  });
 };
 
 // ----------------
@@ -451,10 +454,7 @@ const initialState = function () {
       y: colEnd
     },
     projectiles: [],
-    invadersDirection: {
-      x: 1,
-      y: 0
-    },
+    invadersDirection: 1,
     invaders: [...Array(invaderRows)]
       .map(function (row, rowIndex) {
         return [...Array(invaderCols)].map(function (col, colIndex) {

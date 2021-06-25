@@ -1,5 +1,11 @@
 const noop = function () {};
 
+const constant = function (value) {
+  return function () {
+    return value;
+  };
+};
+
 const status = {
   notInitialized: 'notInitialized',
   running: 'running',
@@ -33,12 +39,61 @@ export const task = function (taskName) {
   taskFn();
 };
 
-let currentState = null;
-let prevState = null;
-let rafId = null;
+let state = null;
 
 export const setState = function (transform) {
-  currentState = transform(currentState);
+  state = transform(state);
+};
+
+const animations = [];
+
+export const addAnimation = function (animation) {
+  const velocity =
+    typeof animation.velocity === 'function'
+      ? animation.velocity
+      : constant(animation.velocity);
+
+  animations.push({
+    update: animation.update,
+    velocity,
+    timeLeft: velocity(state)
+  });
+
+  animations.sort(function (a, b) {
+    const va = a.velocity(state);
+    const vb = b.velocity(state);
+
+    if (va === vb) {
+      return 0;
+    }
+
+    return va < vb ? -1 : 1;
+  });
+
+  console.log(animations);
+};
+
+const applyAnimations = function (elapsed) {
+  animations.forEach(function (animation) {
+    animation.timeLeft -= elapsed;
+
+    if (animation.timeLeft <= 0) {
+      animation.update();
+      animation.timeLeft += animation.velocity(state);
+    }
+  });
+};
+
+const colliders = [];
+
+export const addCollider = function (collider) {
+  colliders.push(collider);
+};
+
+const applyColliders = function () {
+  colliders.forEach(function (collider) {
+    setState(collider);
+  });
 };
 
 const effects = [];
@@ -49,7 +104,7 @@ export const addEffect = function (effect) {
 
 const applyEffects = function () {
   effects.forEach(function (effect) {
-    effect(currentState);
+    effect(state);
   });
 };
 
@@ -60,19 +115,32 @@ export const init = function ({
   onStart = noop,
   onStop = noop
 }) {
+  let rafId = null;
+  let prevTimestamp = 0;
+  let tickCount = 0;
+
   const renderFrame = function () {
     root.innerHTML = '';
-    root.appendChild(render(currentState));
+    root.appendChild(render(state));
   };
 
-  const gameLoop = function () {
-    rafId = requestAnimationFrame(gameLoop);
+  const gameLoop = function (timestamp) {
+    const elapsedMiliseconds = timestamp - prevTimestamp;
+    const fps = 1000 / elapsedMiliseconds;
+    const tick = tickCount;
 
-    if (currentState === prevState) {
+    rafId = requestAnimationFrame(gameLoop);
+    prevTimestamp = timestamp;
+    tickCount++;
+
+    if (tick <= 0) {
       return;
     }
 
-    prevState = currentState;
+    console.log({ tick, fps, elapsedMiliseconds });
+
+    applyAnimations(elapsedMiliseconds);
+    applyColliders();
     renderFrame();
     applyEffects();
   };
@@ -84,7 +152,7 @@ export const init = function ({
 
     engineStatus = status.running;
     onStart();
-    gameLoop();
+    rafId = requestAnimationFrame(gameLoop);
     renderFrame();
   };
 
@@ -100,11 +168,10 @@ export const init = function ({
       tasks.stop();
     }
 
-    prevState = null;
-    currentState = initialState();
+    state = initialState();
     renderFrame();
   };
 
-  currentState = initialState();
+  state = initialState();
   renderFrame();
 };
