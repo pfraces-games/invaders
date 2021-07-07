@@ -1,4 +1,6 @@
-# Space Invaders
+# Invaders
+
+<https://pfraces.github.io/invaders>
 
 ## v0.1.0
 
@@ -140,22 +142,23 @@ I want to improve graphics by adding a canvas-generated space-themed background 
 
 ### Next release
 
-- [ ] Replace shown grid with space-themed background
 - [ ] Replace entity styles with sprites
+- [ ] Add invader explosion sprite
 - [ ] Improve movement by using keydown and keyup events
-- [ ] Replace weapon cooldown by allowing only 1 projectile on the board
+- [ ] Check collisions after each animation
+  - Bound colliders to animations
 
 ### Backlog
 
+- [ ] Add space-themed background
 - [ ] Add score (3 invader types with different score points)
   - 1st row invaders: 10pts
   - 2nd row invaders: 20pts
   - 3rd row invaders: 30pts
-- [ ] Add invader explosion sprite
 - [ ] Add mystery ship (100pts)
 - [ ] Add sound effects
 - [ ] Add background music
-- [ ] Publish on github.io
+- [ ] Add high scores screen (needs server/firebase)
 
 ### N2H
 

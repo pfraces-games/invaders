@@ -16,7 +16,7 @@ const menu = {
 
 const settings = {
   fontSize: '20px',
-  cellSize: '36px',
+  cellSize: '32px',
   gridCols: 17,
   gridRows: 17,
   invaderCols: 11,
