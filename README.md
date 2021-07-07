@@ -1,6 +1,6 @@
 # Space Invaders
 
-## Introduction
+## v0.1.0
 
 I've just watched Ania's [Space Invaders in JavaScript](https://www.youtube.com/watch?v=3Nz4Yp7Y_uA)
 and want to repeat the same exercise by myself.
@@ -41,7 +41,7 @@ It took **6 hours** of development with **346 LOC**.
 - Added start and pause / resume buttons
 - Added a game over overlay
 
-## 2nd implementation
+## v0.2.0
 
 In this case I want to change the implementation by fixing the design failures found in the 1st implementation.
 
@@ -80,7 +80,7 @@ The code has been splitted in 3 files:
 - ASAP render updates by using `requestAnimationFrame`
 - Decoupled game engine
 
-## 3rd implementation
+## v0.3.0
 
 I want to extend the game engine with animations and collisions.
 
