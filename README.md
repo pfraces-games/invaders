@@ -43,9 +43,9 @@ It took **6 hours** of development with **346 LOC**.
 
 ## v0.2.0
 
-In this case I want to change the implementation by fixing the design failures found in the 1st implementation.
+No more speed coding sessions for this project.
 
-This time I don't want to do a speed coding session.
+I want to change the implementation by fixing some design failures.
 
 I want to implement a React-like render and some sort of game engine.
 
@@ -101,6 +101,10 @@ The code has been splitted in 4 files:
 
 I had fun trying to implement a virtual dom engine but the diff algorithm was a lot harder than I though so I ended up using a 3rd party implementation.
 
+While migrating to virtual dom, the state management has been decoupled from the game engine which make implementation simpler.
+
+Collision detection can be improved but is simple and do the job.
+
 ### Product changelog
 
 - Fixed killing leftmost invaders when they are moving down from leftmost position
@@ -111,22 +115,40 @@ I had fun trying to implement a virtual dom engine but the diff algorithm was a 
 
 ### Implementation changelog
 
-- Hid elements outside the canvas
+- Hid elements outside the DOM-based canvas
 - Added app bundler and app server
 - Added game engine management of animations and collisions
 - Added a virtual dom engine
 - State management has been decoupled from game engine
 
+## v0.4.0
+
+I want to make the cell/grid size and the number of columns/rows fully customizable through the settings object.
+
+I want to improve graphics by adding a canvas-generated space-themed background and sprites.
+
+### Implementation changelog
+
+- Refactored defender out of bounds control as a collider
+
 ## TODO
 
+### Next release
+
 - [ ] Dynamic styles based on game config: board and cell sizes
-- [ ] Delegate defender collisions to the game engine
-- [ ] Improve movement by using keydown and keyup events
-- [ ] Replace weapon cooldown by allowing only 1 projectile on the board
-- [ ] Add score (3 invader types with different score points)
 - [ ] Replace shown grid with space-themed background
 - [ ] Replace entity styles with sprites
+- [ ] Improve movement by using keydown and keyup events
+- [ ] Replace weapon cooldown by allowing only 1 projectile on the board
+
+### Backlog
+
+- [ ] Add score (3 invader types with different score points)
+  - 1st row invaders: 10pts
+  - 2nd row invaders: 20pts
+  - 3rd row invaders: 30pts
 - [ ] Add invader explosion sprite
+- [ ] Add mystery ship (100pts)
 - [ ] Add sound effects
 - [ ] Add background music
 - [ ] Publish on github.io

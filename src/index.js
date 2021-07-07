@@ -80,13 +80,7 @@ const pause = function () {
 };
 
 const moveDefenderLeft = function () {
-  const rowStart = 0;
-
   setState(function (state) {
-    if (state.defender.x === rowStart) {
-      return state;
-    }
-
     return {
       ...state,
       defender: {
@@ -98,14 +92,7 @@ const moveDefenderLeft = function () {
 };
 
 const moveDefenderRight = function () {
-  const { gridCols } = settings;
-  const rowEnd = gridCols - 1;
-
   setState(function (state) {
-    if (state.defender.x === rowEnd) {
-      return state;
-    }
-
     return {
       ...state,
       defender: {
@@ -235,6 +222,32 @@ animation.add(projectilesAnimation);
 // Colliders
 // ---------
 
+const defenderOutOfBoundsCollider = function () {
+  const { gridCols } = settings;
+  const rowStart = 0;
+  const rowEnd = gridCols - 1;
+
+  setState(function (state) {
+    let x = state.defender.x;
+
+    if (x < rowStart) {
+      x = rowStart;
+    }
+
+    if (x > rowEnd) {
+      x = rowEnd;
+    }
+
+    return {
+      ...state,
+      defender: {
+        ...state.defender,
+        x
+      }
+    };
+  });
+};
+
 const invadersOutOfBoundsCollider = function () {
   const { gridCols } = settings;
   const rowStart = 0;
@@ -352,6 +365,7 @@ const projectileHitCollider = function () {
   });
 };
 
+collider.add(defenderOutOfBoundsCollider);
 collider.add(invadersOutOfBoundsCollider);
 collider.add(invadersLandingCollider);
 collider.add(projectileLostCollider);
