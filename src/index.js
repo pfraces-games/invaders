@@ -1,15 +1,14 @@
-import {
-  isRunning,
-  task,
-  setState,
-  addAnimation,
-  addCollider,
-  addEffect,
-  init
-} from './lib/game-engine';
+import { mount, h, animation, collider } from './lib/game-engine';
+import { store } from './lib/store';
+import { noop, constant } from './lib/fp';
 
-import { element, text } from './lib/hyperscript';
-import { noop } from './lib/fp';
+const menu = {
+  none: 'none',
+  controls: 'controls',
+  pause: 'pause',
+  youwin: 'youwin',
+  gameover: 'gameover'
+};
 
 // --------
 // Settings
@@ -20,7 +19,7 @@ const settings = {
   gridRows: 15,
   cellWidth: '20px',
   cellHeight: '20px',
-  invaderCols: 10,
+  invaderCols: 9,
   invaderRows: 3,
   invadersMinVelocity: 50,
   invadersIncrementVelocity: 15,
@@ -28,426 +27,18 @@ const settings = {
   minDistanceBetweenProjectiles: 2
 };
 
-// ------------
-// Key Bindings
-// ------------
+// -----
+// Store
+// -----
 
-const keyBindings = (function () {
-  const moveDefenderLeft = function () {
-    const rowStart = 0;
-
-    setState(function (state) {
-      if (state.defender.x === rowStart) {
-        return state;
-      }
-
-      return {
-        ...state,
-        defender: {
-          ...state.defender,
-          x: state.defender.x - 1
-        }
-      };
-    });
-  };
-
-  const moveDefenderRight = function () {
-    setState(function (state) {
-      const { gridCols } = settings;
-      const rowEnd = gridCols - 1;
-
-      if (state.defender.x === rowEnd) {
-        return state;
-      }
-
-      return {
-        ...state,
-        defender: {
-          ...state.defender,
-          x: state.defender.x + 1
-        }
-      };
-    });
-  };
-
-  const fire = function () {
-    setState(function (state) {
-      const newProjectile = {
-        x: state.defender.x,
-        y: state.defender.y - 1
-      };
-
-      const projectileOverlap = state.projectiles.find(function (projectile) {
-        return (
-          newProjectile.y - projectile.y <=
-          settings.minDistanceBetweenProjectiles
-        );
-      });
-
-      if (projectileOverlap) {
-        return state;
-      }
-
-      return {
-        ...state,
-        projectiles: [...state.projectiles, newProjectile]
-      };
-    });
-  };
-
-  return {
-    ArrowLeft: moveDefenderLeft,
-    ArrowRight: moveDefenderRight,
-    ArrowUp: fire
-  };
-})();
-
-const onKeyDown = function (event) {
-  (keyBindings[event.key] || noop)();
-};
-
-// ----------
-// Animations
-// ----------
-
-const invadersAnimation = function () {
-  setState(function (state) {
-    return {
-      ...state,
-      invaders: state.invaders.map(function (invader) {
-        return {
-          ...invader,
-          x: invader.x + state.invadersDirection
-        };
-      })
-    };
-  });
-};
-
-const invadersVelocity = function (state) {
-  const {
-    invaderCols,
-    invaderRows,
-    invadersMinVelocity,
-    invadersIncrementVelocity
-  } = settings;
-
-  const invadersLength = state
-    ? state.invaders.length
-    : invaderCols * invaderRows;
-
-  return invadersMinVelocity + invadersLength * invadersIncrementVelocity;
-};
-
-const projectilesAnimation = function () {
-  setState(function (state) {
-    return {
-      ...state,
-      projectiles: state.projectiles.map(function (projectile) {
-        return {
-          ...projectile,
-          y: projectile.y - 1
-        };
-      })
-    };
-  });
-};
-
-const { projectilesVelocity } = settings;
-
-addAnimation({ update: invadersAnimation, velocity: invadersVelocity });
-addAnimation({ update: projectilesAnimation, velocity: projectilesVelocity });
-
-// ---------
-// Colliders
-// ---------
-
-const invadersOutOfBounds = function (state) {
-  const { gridCols } = settings;
-  const rowStart = 0;
-  const rowEnd = gridCols - 1;
-
-  if (!state.invaders.length) {
-    return state;
-  }
-
-  const leftMostInvader = state.invaders.reduce(function (acc, invader) {
-    return invader.x < acc.x ? invader : acc;
-  });
-
-  const rightMostInvader = state.invaders.reduce(function (acc, invader) {
-    return invader.x > acc.x ? invader : acc;
-  });
-
-  let invadersDirection = state.invadersDirection;
-  let invaders = state.invaders;
-
-  if (rightMostInvader.x > rowEnd || leftMostInvader.x < rowStart) {
-    invadersDirection *= -1;
-
-    invaders = invaders.map(function (invader) {
-      return {
-        x: invader.x + invadersDirection,
-        y: invader.y + 1
-      };
-    });
-  }
-
-  return {
-    ...state,
-    invadersDirection,
-    invaders
-  };
-};
-
-const invadersLandingCollider = function (state) {
-  const { gridRows } = settings;
+const gameState = store(function () {
+  const { gridCols, gridRows, invaderCols, invaderRows } = settings;
   const colEnd = gridRows - 1;
-
-  const invaderLanded = state.invaders.some(function (invader) {
-    return invader.y === colEnd;
-  });
+  const invaderOffsetX = (gridCols - invaderCols) / 2;
+  const invaderOffsetY = 1;
 
   return {
-    ...state,
-    isGameOver: state.isGameOver || invaderLanded
-  };
-};
-
-const projectileLostCollider = function (state) {
-  return {
-    ...state,
-    projectiles: state.projectiles.filter(function (projectile) {
-      return projectile.y >= 0;
-    })
-  };
-};
-
-const projectileHitCollider = function (state) {
-  const collisions = [];
-
-  state.projectiles.forEach(function (projectile) {
-    const collidedInvader = state.invaders.find(function (invader) {
-      return invader.x === projectile.x && invader.y === projectile.y;
-    });
-
-    if (collidedInvader) {
-      collisions.push({
-        x: collidedInvader.x,
-        y: collidedInvader.y
-      });
-    }
-  });
-
-  const projectiles = state.projectiles.filter(function (projectile) {
-    return !collisions.find(function (collision) {
-      return projectile.x === collision.x && projectile.y === collision.y;
-    });
-  });
-
-  const invaders = state.invaders.filter(function (invader) {
-    return !collisions.find(function (collision) {
-      return invader.x === collision.x && invader.y === collision.y;
-    });
-  });
-
-  return {
-    ...state,
-    score: state.score + collisions.length,
-    isGameOver: state.isGameOver || !invaders.length,
-    projectiles,
-    invaders
-  };
-};
-
-addCollider(invadersOutOfBounds);
-addCollider(invadersLandingCollider);
-addCollider(projectileLostCollider);
-addCollider(projectileHitCollider);
-
-// -------
-// Effects
-// -------
-
-addEffect(function (state) {
-  if (state.isGameOver) {
-    task('stop');
-  }
-});
-
-// ----------
-// Life Cycle
-// ----------
-
-const onStart = function () {
-  document.addEventListener('keydown', onKeyDown);
-};
-
-const onStop = function () {
-  document.removeEventListener('keydown', onKeyDown);
-};
-
-// ----------------
-// Render Functions
-// ----------------
-
-const startButton = function () {
-  const onClick = function () {
-    task('start');
-  };
-
-  return element('button', {
-    eventListeners: { click: onClick },
-    childNodes: [text('Start')]
-  });
-};
-
-const pauseButton = function () {
-  const onClick = function () {
-    task('stop');
-  };
-
-  return element('button', {
-    eventListeners: { click: onClick },
-    childNodes: [text('Pause')]
-  });
-};
-
-const resetButton = function () {
-  const onClick = function () {
-    task('reset');
-  };
-
-  return element('button', {
-    eventListeners: { click: onClick },
-    childNodes: [text('Reset')]
-  });
-};
-
-const score = function (state) {
-  return element('div', {
-    classList: ['score'],
-    childNodes: [text(`Score: ${state.score}`)]
-  });
-};
-
-const statusBar = function (state) {
-  return element('div', {
-    classList: ['status-bar'],
-    childNodes: [
-      isRunning() ? pauseButton() : startButton(),
-      resetButton(),
-      score(state)
-    ]
-  });
-};
-
-const cell = function () {
-  return element('div', {
-    classList: ['cell']
-  });
-};
-
-const gridLayer = function () {
-  const { gridCols, gridRows } = settings;
-
-  return element('div', {
-    classList: ['grid-layer'],
-    childNodes: [...Array(gridCols * gridRows)].map(cell)
-  });
-};
-
-const invader = function (invaderState) {
-  return function () {
-    const { cellWidth, cellHeight } = settings;
-
-    return element('div', {
-      classList: ['invader'],
-      styles: {
-        left: `calc(${invaderState.x} * ${cellWidth})`,
-        top: `calc(${invaderState.y} * ${cellHeight})`
-      }
-    });
-  };
-};
-
-const projectile = function (projectileState) {
-  return function () {
-    const { cellWidth, cellHeight } = settings;
-
-    return element('div', {
-      classList: ['projectile'],
-      styles: {
-        left: `calc(${projectileState.x} * ${cellWidth})`,
-        top: `calc(${projectileState.y} * ${cellHeight})`
-      }
-    });
-  };
-};
-
-const defender = function (state) {
-  const { cellWidth, cellHeight } = settings;
-
-  return element('div', {
-    classList: ['defender'],
-    styles: {
-      left: `calc(${state.defender.x} * ${cellWidth})`,
-      top: `calc(${state.defender.y} * ${cellHeight})`
-    }
-  });
-};
-
-const actionLayer = function (state) {
-  const invaders = state.invaders.map(function (invaderState) {
-    return invader(invaderState)();
-  });
-
-  const projectiles = state.projectiles.map(function (projectileState) {
-    return projectile(projectileState)();
-  });
-
-  return element('div', {
-    classList: ['action-layer'],
-    childNodes: [...invaders, ...projectiles, defender(state)]
-  });
-};
-
-const gameOverLayer = function (state) {
-  return element('div', {
-    classList: ['game-over-layer'],
-    childNodes: [text(state.invaders.length ? 'Game Over' : 'You Win')]
-  });
-};
-
-const board = function (state) {
-  return element('div', {
-    classList: ['board'],
-    childNodes: [
-      gridLayer(state),
-      actionLayer(state),
-      state.isGameOver && gameOverLayer(state)
-    ]
-  });
-};
-
-const canvas = function (state) {
-  return element('div', {
-    classList: ['canvas'],
-    childNodes: [statusBar(state), board(state)]
-  });
-};
-
-// --------------
-// Initialization
-// --------------
-
-const initialState = function () {
-  const { gridCols, gridRows, invaderRows, invaderCols } = settings;
-  const colEnd = gridRows - 1;
-
-  return {
-    score: 0,
-    isGameOver: false,
+    currentMenu: menu.controls,
     defender: {
       x: Math.ceil(gridCols / 2) - 1,
       y: colEnd
@@ -457,17 +48,452 @@ const initialState = function () {
     invaders: [...Array(invaderRows)]
       .map(function (row, rowIndex) {
         return [...Array(invaderCols)].map(function (col, colIndex) {
-          return { x: colIndex, y: rowIndex };
+          return { x: colIndex + invaderOffsetX, y: rowIndex + invaderOffsetY };
         });
       })
       .flat()
   };
+});
+
+const { onStateChange, getState, setState, resetState, withState } = gameState;
+
+// ------------
+// Key Bindings
+// ------------
+
+const play = function () {
+  setState(function (state) {
+    return {
+      ...state,
+      currentMenu: menu.none
+    };
+  });
 };
 
-init({
-  root: document.querySelector('#root'),
-  initialState,
-  render: canvas,
-  onStart,
-  onStop
+const pause = function () {
+  setState(function (state) {
+    return {
+      ...state,
+      currentMenu: menu.pause
+    };
+  });
+};
+
+const moveDefenderLeft = function () {
+  const rowStart = 0;
+
+  setState(function (state) {
+    if (state.defender.x === rowStart) {
+      return state;
+    }
+
+    return {
+      ...state,
+      defender: {
+        ...state.defender,
+        x: state.defender.x - 1
+      }
+    };
+  });
+};
+
+const moveDefenderRight = function () {
+  const { gridCols } = settings;
+  const rowEnd = gridCols - 1;
+
+  setState(function (state) {
+    if (state.defender.x === rowEnd) {
+      return state;
+    }
+
+    return {
+      ...state,
+      defender: {
+        ...state.defender,
+        x: state.defender.x + 1
+      }
+    };
+  });
+};
+
+const fire = function () {
+  const { minDistanceBetweenProjectiles } = settings;
+
+  setState(function (state) {
+    const newProjectile = {
+      x: state.defender.x,
+      y: state.defender.y - 1
+    };
+
+    const projectileOverlap = state.projectiles.find(function (projectile) {
+      return newProjectile.y - projectile.y <= minDistanceBetweenProjectiles;
+    });
+
+    if (projectileOverlap) {
+      return state;
+    }
+
+    return {
+      ...state,
+      projectiles: [...state.projectiles, newProjectile]
+    };
+  });
+};
+
+const gameKeyBindings = {
+  Escape: pause,
+  ArrowLeft: moveDefenderLeft,
+  ArrowRight: moveDefenderRight,
+  Spacebar: fire
+};
+
+const menuKeyBindings = {
+  controls: {
+    Spacebar: play
+  },
+  pause: {
+    Spacebar: play
+  },
+  youwin: {
+    Escape: resetState
+  },
+  gameover: {
+    Escape: resetState
+  }
+};
+
+const onKeyDown = function (event) {
+  let key = event.key;
+
+  if (key === ' ') {
+    key = 'Spacebar';
+  }
+
+  const currentMenu = getState(function ({ currentMenu }) {
+    return currentMenu;
+  });
+
+  if (currentMenu === menu.none) {
+    (gameKeyBindings[key] || noop)();
+    return;
+  }
+
+  (menuKeyBindings[currentMenu][key] || noop)();
+};
+
+document.addEventListener('keydown', onKeyDown);
+
+// ----------
+// Animations
+// ----------
+
+const invadersAnimation = {
+  update: function () {
+    setState(function (state) {
+      return {
+        ...state,
+        invaders: state.invaders.map(function (invader) {
+          return {
+            ...invader,
+            x: invader.x + state.invadersDirection
+          };
+        })
+      };
+    });
+  },
+  velocity: function () {
+    const { invadersMinVelocity, invadersIncrementVelocity } = settings;
+
+    return getState(function (state) {
+      const invadersLength = state.invaders.length;
+      return invadersMinVelocity + invadersLength * invadersIncrementVelocity;
+    });
+  }
+};
+
+const projectilesAnimation = {
+  update: function () {
+    setState(function (state) {
+      return {
+        ...state,
+        projectiles: state.projectiles.map(function (projectile) {
+          return {
+            ...projectile,
+            y: projectile.y - 1
+          };
+        })
+      };
+    });
+  },
+  velocity: constant(settings.projectilesVelocity)
+};
+
+animation.add(invadersAnimation);
+animation.add(projectilesAnimation);
+
+// ---------
+// Colliders
+// ---------
+
+const invadersOutOfBoundsCollider = function () {
+  const { gridCols } = settings;
+  const rowStart = 0;
+  const rowEnd = gridCols - 1;
+
+  setState(function (state) {
+    if (!state.invaders.length) {
+      return state;
+    }
+
+    const leftMostInvader = state.invaders.reduce(function (acc, invader) {
+      return invader.x < acc.x ? invader : acc;
+    });
+
+    const rightMostInvader = state.invaders.reduce(function (acc, invader) {
+      return invader.x > acc.x ? invader : acc;
+    });
+
+    let invadersDirection = state.invadersDirection;
+    let invaders = state.invaders;
+
+    if (rightMostInvader.x > rowEnd || leftMostInvader.x < rowStart) {
+      invadersDirection *= -1;
+
+      invaders = invaders.map(function (invader) {
+        return {
+          x: invader.x + invadersDirection,
+          y: invader.y + 1
+        };
+      });
+    }
+
+    return {
+      ...state,
+      invadersDirection,
+      invaders
+    };
+  });
+};
+
+const invadersLandingCollider = function () {
+  setState(function (state) {
+    const { gridRows } = settings;
+    const colEnd = gridRows - 1;
+
+    const invaderLanded = state.invaders.some(function (invader) {
+      return invader.y === colEnd;
+    });
+
+    let currentMenu = state.currentMenu;
+
+    if (invaderLanded) {
+      currentMenu = menu.gameover;
+    }
+
+    return {
+      ...state,
+      currentMenu
+    };
+  });
+};
+
+const projectileLostCollider = function () {
+  setState(function (state) {
+    return {
+      ...state,
+      projectiles: state.projectiles.filter(function (projectile) {
+        return projectile.y >= 0;
+      })
+    };
+  });
+};
+
+const projectileHitCollider = function () {
+  setState(function (state) {
+    const collisions = [];
+
+    state.projectiles.forEach(function (projectile) {
+      const collidedInvader = state.invaders.find(function (invader) {
+        return invader.x === projectile.x && invader.y === projectile.y;
+      });
+
+      if (collidedInvader) {
+        collisions.push({
+          x: collidedInvader.x,
+          y: collidedInvader.y
+        });
+      }
+    });
+
+    const projectiles = state.projectiles.filter(function (projectile) {
+      return !collisions.find(function (collision) {
+        return projectile.x === collision.x && projectile.y === collision.y;
+      });
+    });
+
+    const invaders = state.invaders.filter(function (invader) {
+      return !collisions.find(function (collision) {
+        return invader.x === collision.x && invader.y === collision.y;
+      });
+    });
+
+    let currentMenu = state.currentMenu;
+
+    if (!invaders.length) {
+      currentMenu = menu.youwin;
+    }
+
+    return {
+      ...state,
+      currentMenu,
+      projectiles,
+      invaders
+    };
+  });
+};
+
+collider.add(invadersOutOfBoundsCollider);
+collider.add(invadersLandingCollider);
+collider.add(projectileLostCollider);
+collider.add(projectileHitCollider);
+
+// ---------------
+// State listeners
+// ---------------
+
+onStateChange(function ({ currentMenu }) {
+  const action = currentMenu === menu.none ? 'run' : 'stop';
+  animation[action]();
 });
+
+// ----------
+// Components
+// ----------
+
+const cellComponent = function () {
+  return h('div.cell');
+};
+
+const gridLayerComponent = function ({ cols, rows }) {
+  return h('div.grid-layer', [...Array(cols * rows)].map(cellComponent));
+};
+
+const entityComponent = function ({ type, x, y }) {
+  const { cellWidth, cellHeight } = settings;
+
+  return h(`div.${type}`, {
+    style: {
+      left: `calc(${x} * ${cellWidth})`,
+      top: `calc(${y} * ${cellHeight})`
+    }
+  });
+};
+
+const invaderComponent = function ({ x, y }) {
+  return entityComponent({ type: 'invader', x, y });
+};
+
+const defenderComponent = function ({ x, y }) {
+  return entityComponent({ type: 'defender', x, y });
+};
+
+const projectileComponent = function ({ x, y }) {
+  return entityComponent({ type: 'projectile', x, y });
+};
+
+const actionLayerComponent = function ({ invaders, projectiles, defender }) {
+  return h('div.action-layer', [
+    ...invaders.map(invaderComponent),
+    ...projectiles.map(projectileComponent),
+    defenderComponent(defender)
+  ]);
+};
+
+const menuTitleComponent = function () {
+  return h(
+    'pre.menu-title',
+    [
+      '    ____                     __              ',
+      '   /  _/___ _   ______ _____/ /__  __________',
+      '   / // __ \\ | / / __ `/ __  / _ \\/ ___/ ___/',
+      ' _/ // / / / |/ / /_/ / /_/ /  __/ /  (__  ) ',
+      '/___/_/ /_/|___/\\__,_/\\__,_/\\___/_/  /____/  '
+    ].join('\n')
+  );
+};
+
+const menuContentControlsComponent = function () {
+  return h('div.menu-content', [
+    h('p', 'CONTROLS'),
+    h('ul', [
+      h('li', 'LEFT / RIGHT: Move defender'),
+      h('li', 'SPACEBAR: Fire'),
+      h('li', 'ESCAPE: Pause')
+    ]),
+    h('p', 'Press SPACEBAR to start')
+  ]);
+};
+
+const menuContentPauseComponent = function () {
+  return h('div.menu-content', [
+    h('p', 'PAUSED'),
+    h('p', 'Press SPACEBAR to resume')
+  ]);
+};
+
+const menuContentYouWinComponent = function () {
+  return h('div.menu-content', [
+    h('p', 'YOU WIN!'),
+    h('p', 'Press ESCAPE to restart')
+  ]);
+};
+
+const menuContentGameOverComponent = function () {
+  return h('div.menu-content', [
+    h('p', 'GAME OVER'),
+    h('p', 'Press ESCAPE to restart')
+  ]);
+};
+
+const menuLayerComponent = function ({ currentMenu }) {
+  if (currentMenu === menu.none) {
+    return null;
+  }
+
+  let menuContentComponent = constant(null);
+
+  if (currentMenu === menu.controls) {
+    menuContentComponent = menuContentControlsComponent;
+  }
+
+  if (currentMenu === menu.pause) {
+    menuContentComponent = menuContentPauseComponent;
+  }
+
+  if (currentMenu === menu.youwin) {
+    menuContentComponent = menuContentYouWinComponent;
+  }
+
+  if (currentMenu === menu.gameover) {
+    menuContentComponent = menuContentGameOverComponent;
+  }
+
+  return h('div.menu-layer', [menuTitleComponent(), menuContentComponent()]);
+};
+
+const canvasComponent = function ({ state }) {
+  const { gridCols: cols, gridRows: rows } = settings;
+  const { currentMenu, invaders, projectiles, defender } = state;
+
+  return h('div.canvas', [
+    gridLayerComponent({ cols, rows }),
+    actionLayerComponent({ invaders, projectiles, defender }),
+    menuLayerComponent({ currentMenu })
+  ]);
+};
+
+// ----
+// Init
+// ----
+
+mount(document.getElementById('canvas'), withState(canvasComponent));

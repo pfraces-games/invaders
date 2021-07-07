@@ -24,72 +24,115 @@ Let's begin!
 
 ### Retrospective
 
-Game is finally complete! It took **6 hours** of development with **346 LOC**.
+Game is finally complete!
 
-**Additional features:**
+It took **6 hours** of development with **346 LOC**.
 
-- Move remaining invaders to the edges of the canvas
-- Start and pause / resume buttons
-- Game over overlay
+**Higlights:**
 
-**Design failures:**
+- Missing dev tools (linter and formatter)
+- Keeping render functions pure and immutable state updates was not possible due to the rush
+- Tiles positioning could be simpler by using absolute positioning
+- The resulting implementation was a monolith which coupled game engine and game mechanics
 
-- [x] Missing `editorConfig` and `eslint` settings decreases development time
-- [x] Render functions are not pure
-- [x] Status bar should be included in the render pipeline
-- [x] Tiles positioning should be simplified using `position: absolute`
-- [x] State updates mixed mutations with immutable updates
-- [x] Missing rendering updates as soon as possible by using `requestAnimationFrame`
-- [x] Game engine is spreaded all over the code
-- [ ] Collision detection issues due to the async nature of the state updates
-- [ ] Collision detection is domain specific
-- [ ] Collision detection is spreaded all over the code
-- [ ] Missing unified game loop
+### Product changelog (from Ania's implementation)
 
-## 2nd exercise
+- Moved remaining invaders to the edges of the canvas
+- Added start and pause / resume buttons
+- Added a game over overlay
 
-In this case I want to change the implementation by fixing the design failures
-found in the 1st exercise. This time I don't want to do a speed coding session.
-Instead I want to implement a React-like render and some sort of game engine.
+## 2nd implementation
+
+In this case I want to change the implementation by fixing the design failures found in the 1st implementation.
+
+This time I don't want to do a speed coding session.
+
+I want to implement a React-like render and some sort of game engine.
 
 ### Retrospective
 
-Game is finally complete! I've removed the invader landing and defender dead
-styles for simplicity of implementation. The only check for game over is for the
-invader to reach the last column.
+Game is finally complete!
 
 The code has been splitted in 3 files:
 
-- hyperscript.js with 42 LOC
-- game-engine.js with 101 LOC
-- app.js with 480 LOC
+- `hyperscript.js`: 42 LOC
+- `game-engine.js`: 101 LOC
+- `app.js`: 480 LOC
 
-**Pending design failures (from previous implementation):**
+**Higlights:**
 
-- [x] Missing unified game loop
-- [x] Collision detection is domain specific
-- [x] Collision detection is spreaded all over the code
-- [x] Collision detection issues due to the async nature of the state updates
+- Missing dev tools (app bundler and app server)
+- Missing game engine management of animations and collisions
+- Missing a virtual dom engine
 
-**Design failures:**
+### Product changelog
 
-- [x] Avoid gameOver side effects from setState
-- [x] Avoid using setTimeout to render gameOver
-- [x] Hide elements outside canvas boundaries
-- [x] Missing development environment (app server and bundler with support for modules)
-- [x] (Bug) Killing leftmost invaders when they are moving down from leftmost position
-- [x] Remove state diff optimization
-- [x] Velocity as a function of state
-- [ ] Game engine single export: `init((deps) => config)`
-- [ ] Move life cycle from engine to game
-- [ ] Add virtual dom to optimize memory usage and to fix mouse interacions
-- [ ] Replace components HOFs by providing the state needed by named props
-- [ ] Add component memoization
+- Removed the invader landing and defender dead styles to simplify implementation.
+- The only game over condition is that the invader reaches the last row.
+
+### Implementation changelog
+
+- Added `editorConfig` and `eslint` development tools
+- Pure render functions
+- Added status bar to the render pipeline
+- Simplified tiles positioning by using `position: absolute`
+- Immutable state updates
+- ASAP render updates by using `requestAnimationFrame`
+- Decoupled game engine
+
+## 3rd implementation
+
+I want to extend the game engine with animations and collisions.
+
+Also, let's build a virtual dom engine!
+
+### Retrospective
+
+Game is finally complete!
+
+The code has been splitted in 4 files:
+
+- `src/lib/fp.js`: 8 LOC
+- `src/lib/game-engine.js`: 96 LOC
+- `src/lib/store.js`: 33 LOC
+- `src/index.js`: 500 LOC
+
+**Highlights:**
+
+I had fun trying to implement a virtual dom engine but the diff algorithm was a lot harder than I though so I ended up using a 3rd party implementation.
+
+### Product changelog
+
+- Fixed killing leftmost invaders when they are moving down from leftmost position
+- Invaders velocity increases when invaders are killed
+- Added defender weapon cooldown
+- Replaced statusbar actions with menus
+- Removed player score
+
+### Implementation changelog
+
+- Hid elements outside the canvas
+- Added app bundler and app server
+- Added game engine management of animations and collisions
+- Added a virtual dom engine
+- State management has been decoupled from game engine
+
+## TODO
+
+- [ ] Dynamic styles based on game config: board and cell sizes
+- [ ] Delegate defender collisions to the game engine
 - [ ] Improve movement by using keydown and keyup events
-- [ ] Improve status bar buttons texts and visibility
-- [ ] Improve collisions: Killed invaders having other invaders underneath
-  - Enities with `{ render, updatePosition, colliders }` methods
-  - Manage decimal positions in colliders rounded to integers in grid cells
-- [ ] (Optional) Debug tools: fps graph and state viewer
-- [ ] (Optional) State selectors `getState((state) => selector)` and partial state updates
-- [ ] (Optional) Use reactivity to control component updates
+- [ ] Replace weapon cooldown by allowing only 1 projectile on the board
+- [ ] Add score (3 invader types with different score points)
+- [ ] Replace shown grid with space-themed background
+- [ ] Replace entity styles with sprites
+- [ ] Add invader explosion sprite
+- [ ] Add sound effects
+- [ ] Add background music
+- [ ] Publish on github.io
+
+### N2H
+
+- [ ] Movement smooth transitions
+- [ ] State reducers
+- [ ] Partial state updates

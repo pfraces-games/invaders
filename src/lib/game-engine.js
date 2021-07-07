@@ -1,171 +1,95 @@
-import { noop, constant } from './fp';
+import { init, styleModule } from 'snabbdom';
+export { h } from 'snabbdom';
 
-const status = {
-  notInitialized: 'notInitialized',
-  running: 'running',
-  stopped: 'stopped'
-};
+const patch = init([styleModule]);
 
-let engineStatus = status.notInitialized;
-
-export const isRunning = function () {
-  return engineStatus === status.running;
-};
-
-const errNotInitialized = function () {
-  console.error('Not initialized');
-};
-
-const tasks = {
-  start: errNotInitialized,
-  stop: errNotInitialized,
-  reset: errNotInitialized
-};
-
-export const task = function (taskName) {
-  const taskFn = tasks[taskName];
-
-  if (!taskFn) {
-    console.error(`Task not defined: ${taskName}`);
-    return;
-  }
-
-  taskFn();
-};
-
-let state = null;
-
-export const setState = function (transform) {
-  state = transform(state);
-};
+// ----------
+// Animations
+// ----------
 
 const animations = [];
+let isAnimationRunning = false;
 
-export const addAnimation = function (animation) {
-  const velocity =
-    typeof animation.velocity === 'function'
-      ? animation.velocity
-      : constant(animation.velocity);
+const runAnimation = function () {
+  isAnimationRunning = true;
+};
 
+const stopAnimation = function () {
+  isAnimationRunning = false;
+};
+
+const addAnimation = function (animation) {
   animations.push({
-    update: animation.update,
-    velocity,
-    timeLeft: velocity(state)
+    ...animation,
+    timeLeft: animation.velocity()
   });
-
-  animations.sort(function (a, b) {
-    const va = a.velocity(state);
-    const vb = b.velocity(state);
-
-    if (va === vb) {
-      return 0;
-    }
-
-    return va < vb ? -1 : 1;
-  });
-
-  console.log(animations);
 };
 
 const applyAnimations = function (elapsed) {
+  if (!isAnimationRunning) {
+    return;
+  }
+
   animations.forEach(function (animation) {
     animation.timeLeft -= elapsed;
 
     if (animation.timeLeft <= 0) {
       animation.update();
-      animation.timeLeft += animation.velocity(state);
+      animation.timeLeft += animation.velocity();
     }
   });
 };
 
+export const animation = {
+  run: runAnimation,
+  stop: stopAnimation,
+  add: addAnimation
+};
+
+// ---------
+// Colliders
+// ---------
+
 const colliders = [];
 
-export const addCollider = function (collider) {
+const addCollider = function (collider) {
   colliders.push(collider);
 };
 
 const applyColliders = function () {
   colliders.forEach(function (collider) {
-    setState(collider);
+    collider();
   });
 };
 
-const effects = [];
-
-export const addEffect = function (effect) {
-  effects.push(effect);
+export const collider = {
+  add: addCollider
 };
 
-const applyEffects = function () {
-  effects.forEach(function (effect) {
-    effect(state);
-  });
-};
+// ---------
+// Game loop
+// ---------
 
-export const init = function ({
-  root,
-  initialState,
-  render,
-  onStart = noop,
-  onStop = noop
-}) {
-  let rafId = null;
-  let prevTimestamp = 0;
-  let tickCount = 0;
+export const mount = function (root, component) {
+  let vnode = component();
+  let timestamp = 0;
 
-  const renderFrame = function () {
-    root.innerHTML = '';
-    root.appendChild(render(state));
-  };
+  const gameLoop = function (newTimestamp) {
+    const elapsed = newTimestamp - timestamp;
 
-  const gameLoop = function (timestamp) {
-    const elapsedMiliseconds = timestamp - prevTimestamp;
-    const fps = 1000 / elapsedMiliseconds;
-    const tick = tickCount;
-
-    rafId = requestAnimationFrame(gameLoop);
-    prevTimestamp = timestamp;
-    tickCount++;
-
-    if (tick <= 0) {
-      return;
+    if (timestamp > 0) {
+      applyAnimations(elapsed);
+      applyColliders();
     }
 
-    console.log({ tick, fps, elapsedMiliseconds });
+    const newVnode = component();
+    patch(vnode, newVnode);
 
-    applyAnimations(elapsedMiliseconds);
-    applyColliders();
-    renderFrame();
-    applyEffects();
+    vnode = newVnode;
+    timestamp = newTimestamp;
+    requestAnimationFrame(gameLoop);
   };
 
-  tasks.start = function () {
-    if (isRunning()) {
-      return;
-    }
-
-    engineStatus = status.running;
-    onStart();
-    rafId = requestAnimationFrame(gameLoop);
-    renderFrame();
-  };
-
-  tasks.stop = function () {
-    engineStatus = status.stopped;
-    onStop();
-    cancelAnimationFrame(rafId);
-    renderFrame();
-  };
-
-  tasks.reset = function () {
-    if (isRunning()) {
-      tasks.stop();
-    }
-
-    state = initialState();
-    renderFrame();
-  };
-
-  state = initialState();
-  renderFrame();
+  patch(root, vnode);
+  requestAnimationFrame(gameLoop);
 };
