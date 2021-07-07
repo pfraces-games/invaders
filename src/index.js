@@ -15,16 +15,16 @@ const menu = {
 // --------
 
 const settings = {
-  gridCols: 15,
-  gridRows: 15,
-  cellWidth: '20px',
-  cellHeight: '20px',
-  invaderCols: 9,
-  invaderRows: 3,
+  fontSize: '20px',
+  cellSize: '36px',
+  gridCols: 17,
+  gridRows: 17,
+  invaderCols: 11,
+  invaderRows: 5,
   invadersMinVelocity: 50,
   invadersIncrementVelocity: 15,
-  projectilesVelocity: 100,
-  minDistanceBetweenProjectiles: 2
+  projectilesVelocity: 50,
+  maxConcurrentProjectiles: 1
 };
 
 // -----
@@ -104,25 +104,27 @@ const moveDefenderRight = function () {
 };
 
 const fire = function () {
-  const { minDistanceBetweenProjectiles } = settings;
+  const { maxConcurrentProjectiles } = settings;
 
   setState(function (state) {
+    const { projectiles } = state;
+
     const newProjectile = {
       x: state.defender.x,
       y: state.defender.y - 1
     };
 
-    const projectileOverlap = state.projectiles.find(function (projectile) {
-      return newProjectile.y - projectile.y <= minDistanceBetweenProjectiles;
+    const projectileOverlap = projectiles.find(function (projectile) {
+      return newProjectile.y === projectile.y;
     });
 
-    if (projectileOverlap) {
+    if (projectileOverlap || projectiles.length === maxConcurrentProjectiles) {
       return state;
     }
 
     return {
       ...state,
-      projectiles: [...state.projectiles, newProjectile]
+      projectiles: [...projectiles, newProjectile]
     };
   });
 };
@@ -384,21 +386,15 @@ onStateChange(function ({ currentMenu }) {
 // Components
 // ----------
 
-const cellComponent = function () {
-  return h('div.cell');
-};
-
-const gridLayerComponent = function ({ cols, rows }) {
-  return h('div.grid-layer', [...Array(cols * rows)].map(cellComponent));
-};
-
 const entityComponent = function ({ type, x, y }) {
-  const { cellWidth, cellHeight } = settings;
+  const { cellSize } = settings;
 
   return h(`div.${type}`, {
     style: {
-      left: `calc(${x} * ${cellWidth})`,
-      top: `calc(${y} * ${cellHeight})`
+      width: cellSize,
+      height: cellSize,
+      left: `calc(${x} * ${cellSize})`,
+      top: `calc(${y} * ${cellSize})`
     }
   });
 };
@@ -424,8 +420,15 @@ const actionLayerComponent = function ({ invaders, projectiles, defender }) {
 };
 
 const menuTitleComponent = function () {
+  const { fontSize } = settings;
+
   return h(
     'pre.menu-title',
+    {
+      style: {
+        fontSize: `calc(${fontSize} * 0.75)`
+      }
+    },
     [
       '    ____                     __              ',
       '   /  _/___ _   ______ _____/ /__  __________',
@@ -496,14 +499,23 @@ const menuLayerComponent = function ({ currentMenu }) {
 };
 
 const canvasComponent = function ({ state }) {
-  const { gridCols: cols, gridRows: rows } = settings;
+  const { fontSize, cellSize, gridCols, gridRows } = settings;
   const { currentMenu, invaders, projectiles, defender } = state;
 
-  return h('div.canvas', [
-    gridLayerComponent({ cols, rows }),
-    actionLayerComponent({ invaders, projectiles, defender }),
-    menuLayerComponent({ currentMenu })
-  ]);
+  return h(
+    'div.canvas',
+    {
+      style: {
+        fontSize,
+        width: `calc(${cellSize} * ${gridCols})`,
+        height: `calc(${cellSize} * ${gridRows})`
+      }
+    },
+    [
+      actionLayerComponent({ invaders, projectiles, defender }),
+      menuLayerComponent({ currentMenu })
+    ]
+  );
 };
 
 // ----

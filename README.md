@@ -127,15 +127,19 @@ I want to make the cell/grid size and the number of columns/rows fully customiza
 
 I want to improve graphics by adding a canvas-generated space-themed background and sprites.
 
+### Product changelog
+
+- Changed fire cooldown by allowing a single flying projectile
+
 ### Implementation changelog
 
-- Refactored defender out of bounds control as a collider
+- Defender out of bounds response implemented as a collider
+- Added dynamic grid sizing based on settings
 
 ## TODO
 
 ### Next release
 
-- [ ] Dynamic styles based on game config: board and cell sizes
 - [ ] Replace shown grid with space-themed background
 - [ ] Replace entity styles with sprites
 - [ ] Improve movement by using keydown and keyup events

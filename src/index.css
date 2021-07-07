@@ -20,8 +20,6 @@ body {
   position: relative;
   overflow: hidden;
   border: 1px solid yellow;
-  width: 300px;
-  height: 300px;
 }
 
 .grid-layer {
@@ -32,8 +30,6 @@ body {
 
 .cell {
   box-sizing: border-box;
-  width: 20px;
-  height: 20px;
   background-color: lightgrey;
   border: 1px solid white;
 }
@@ -44,28 +40,16 @@ body {
 
 .invader {
   position: absolute;
-  margin: 1px;
-  width: 18px;
-  height: 18px;
-  border-radius: 9px;
   background-color: purple;
 }
 
 .defender {
   position: absolute;
-  margin: 1px;
-  width: 18px;
-  height: 18px;
-  border-radius: 9px;
   background-color: blue;
 }
 
 .projectile {
   position: absolute;
-  margin: 1px 7px;
-  width: 6px;
-  height: 18px;
-  border-radius: 9px;
   background-color: yellow;
 }
 
@@ -85,8 +69,6 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
-  font-size: 0.6rem;
   text-align: center;
 }
 
@@ -96,10 +78,6 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-}
-
-.menu-content p {
-  font-size: 1rem;
 }
 
 .menu-content ul {
