@@ -2,6 +2,10 @@ import { mount, h, animation, collider } from './lib/game-engine';
 import { store } from './lib/store';
 import { noop, constant } from './lib/fp';
 
+// -----
+// Enums
+// -----
+
 const menu = {
   none: 'none',
   controls: 'controls',
@@ -44,6 +48,7 @@ const gameState = store(function () {
       y: colEnd
     },
     projectiles: [],
+    explosions: [],
     invadersDirection: 1,
     invaders: [...Array(invaderRows)]
       .map(function (row, rowIndex) {
@@ -176,6 +181,15 @@ document.addEventListener('keydown', onKeyDown);
 // Animations
 // ----------
 
+const invadersVelocity = function () {
+  const { invadersMinVelocity, invadersIncrementVelocity } = settings;
+
+  return getState(function (state) {
+    const invadersLength = state.invaders.length;
+    return invadersMinVelocity + invadersLength * invadersIncrementVelocity;
+  });
+};
+
 const invadersAnimation = {
   update: function () {
     setState(function (state) {
@@ -190,14 +204,7 @@ const invadersAnimation = {
       };
     });
   },
-  velocity: function () {
-    const { invadersMinVelocity, invadersIncrementVelocity } = settings;
-
-    return getState(function (state) {
-      const invadersLength = state.invaders.length;
-      return invadersMinVelocity + invadersLength * invadersIncrementVelocity;
-    });
-  }
+  velocity: invadersVelocity
 };
 
 const projectilesAnimation = {
@@ -217,8 +224,21 @@ const projectilesAnimation = {
   velocity: constant(settings.projectilesVelocity)
 };
 
+const explosionsAnimation = {
+  update: function () {
+    setState(function (state) {
+      return {
+        ...state,
+        explosions: []
+      };
+    });
+  },
+  velocity: invadersVelocity
+};
+
 animation.add(invadersAnimation);
 animation.add(projectilesAnimation);
+animation.add(explosionsAnimation);
 
 // ---------
 // Colliders
@@ -362,6 +382,7 @@ const projectileHitCollider = function () {
       ...state,
       currentMenu,
       projectiles,
+      explosions: [...state.explosions, ...collisions],
       invaders
     };
   });
@@ -386,10 +407,10 @@ onStateChange(function ({ currentMenu }) {
 // Components
 // ----------
 
-const entityComponent = function ({ type, x, y }) {
+const entityComponent = function ({ className, x, y }) {
   const { cellSize } = settings;
 
-  return h(`div.${type}`, {
+  return h(`div.${className}`, {
     style: {
       width: cellSize,
       height: cellSize,
@@ -400,21 +421,31 @@ const entityComponent = function ({ type, x, y }) {
 };
 
 const invaderComponent = function ({ x, y }) {
-  return entityComponent({ type: 'invader', x, y });
+  return entityComponent({ className: 'invader', x, y });
 };
 
 const defenderComponent = function ({ x, y }) {
-  return entityComponent({ type: 'defender', x, y });
+  return entityComponent({ className: 'defender', x, y });
 };
 
 const projectileComponent = function ({ x, y }) {
-  return entityComponent({ type: 'projectile', x, y });
+  return entityComponent({ className: 'projectile', x, y });
 };
 
-const actionLayerComponent = function ({ invaders, projectiles, defender }) {
+const explosionComponent = function ({ x, y }) {
+  return entityComponent({ className: 'explosion', x, y });
+};
+
+const actionLayerComponent = function ({
+  invaders,
+  projectiles,
+  explosions,
+  defender
+}) {
   return h('div.action-layer', [
     ...invaders.map(invaderComponent),
     ...projectiles.map(projectileComponent),
+    ...explosions.map(explosionComponent),
     defenderComponent(defender)
   ]);
 };
@@ -500,7 +531,7 @@ const menuLayerComponent = function ({ currentMenu }) {
 
 const canvasComponent = function ({ state }) {
   const { fontSize, cellSize, gridCols, gridRows } = settings;
-  const { currentMenu, invaders, projectiles, defender } = state;
+  const { currentMenu, invaders, projectiles, explosions, defender } = state;
 
   return h(
     'div.canvas',
@@ -512,7 +543,7 @@ const canvasComponent = function ({ state }) {
       }
     },
     [
-      actionLayerComponent({ invaders, projectiles, defender }),
+      actionLayerComponent({ invaders, projectiles, explosions, defender }),
       menuLayerComponent({ currentMenu })
     ]
   );

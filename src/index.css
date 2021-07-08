@@ -53,6 +53,11 @@ body {
   background-color: yellow;
 }
 
+.explosion {
+  position: absolute;
+  background-color: red;
+}
+
 .menu-layer {
   position: absolute;
   width: 100%;
