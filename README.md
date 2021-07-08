@@ -127,43 +127,82 @@ Collision detection can be improved but is simple and do the job.
 
 I want to make the cell/grid size and the number of columns/rows fully customizable through the settings object.
 
-I want to improve graphics by adding a canvas-generated space-themed background and sprites.
+I want to improve graphics by adding sprites.
+
+### Retrospective
+
+Full rewrite was not needed this time!
+
+I wanted to release this version even with known bugs and missing sprites because I wanted to publish with the recently added sprites and I want to publish only released versions
+
+Source code stats:
+
+- `src/lib/fp.js`: 6 LOC
+- `src/lib/game-engine.js`: 149 LOC
+- `src/lib/store.js`: 33 LOC
+- `src/index.js`: 581 LOC
+
+**Highlights:**
+
+- Impressive impact on user experience by adding sprites!
+- New key bindings system successfully removed the effect of movement freeze but added new challenges:
+  - It makes difficult to move the defender a single cell
+  - It had issues in menus so a `keyboard.reset` hack has been needed
+- Collision detection bug still persists
 
 ### Product changelog
 
 - Changed fire cooldown by allowing a single flying projectile
-- Added invader explosions
-- Improved movement by using keydown and keyup events
+- Improved movement by using keydown/keyup events
+- Added sprites
 
 ### Implementation changelog
 
 - Defender out of bounds response implemented as a collider
 - Added dynamic grid sizing based on settings
+- Added invader explosions (yet invisible due to missing sprite)
+- Moved key bindings management to game engine
+- Defender movement implemented as an animation
 
-## TODO
+## v0.5.0 (WIP)
 
-### Next release
+Improve graphics by adding a canvas-generated space-themed background.
 
-- [ ] Check collisions after each animation
-  - Bound colliders to animations
+Fix known issues and implementation improvements.
+
+### TODO
+
+- [ ] Fix collision bug
+  - Bind animations to colliders
+  - Check collisions after applying bound animation
+- [ ] Clear explosions on game end
+  - Move game end conditions to state change event
+  - Prevent state change events loop
+- [ ] Add defender explosion when invader reaches last row
+  - Remove invader if collides with defender
 - [ ] Replace `keyboard.reset` with keypress events
+  - Improve keyboard bindings for menus
+  - Improve screens management
 - [ ] Move components to its own folder
-- [ ] Replace entity styles with sprites
-
-### Backlog
-
 - [ ] Add space-themed background
+
+## Backlog
+
 - [ ] Add score (3 invader types with different score points)
   - 1st row invaders: 10pts
   - 2nd row invaders: 20pts
   - 3rd row invaders: 30pts
 - [ ] Add mystery ship (100pts)
+- [ ] Add high scores screen (needs server/firebase)
 - [ ] Add sound effects
 - [ ] Add background music
-- [ ] Add high scores screen (needs server/firebase)
 
 ### N2H
 
 - [ ] Movement smooth transitions
+- [ ] Sprite animations
+- [ ] Sprite groups
+- [ ] Actors composed by multiple sprites
+- [ ] Add state selectors to `withState` HOC
 - [ ] State reducers
 - [ ] Partial state updates
