@@ -132,7 +132,8 @@ I want to improve graphics by adding a canvas-generated space-themed background 
 ### Product changelog
 
 - Changed fire cooldown by allowing a single flying projectile
-- Add invader explosions
+- Added invader explosions
+- Improved movement by using keydown and keyup events
 
 ### Implementation changelog
 
@@ -143,10 +144,10 @@ I want to improve graphics by adding a canvas-generated space-themed background 
 
 ### Next release
 
-- [ ] Move components to its own folder
 - [ ] Check collisions after each animation
   - Bound colliders to animations
-- [ ] Improve movement by using keydown and keyup events
+- [ ] Replace `keyboard.reset` with keypress events
+- [ ] Move components to its own folder
 - [ ] Replace entity styles with sprites
 
 ### Backlog
