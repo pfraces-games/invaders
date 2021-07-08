@@ -36,11 +36,39 @@ const settings = {
 // Store
 // -----
 
-const gameState = store(function () {
-  const { gridCols, gridRows, invaderCols, invaderRows } = settings;
-  const colEnd = gridRows - 1;
+const invaderType = function (row) {
+  if (row === 0) {
+    return 'alfa';
+  }
+
+  if (row <= 2) {
+    return 'beta';
+  }
+
+  return 'gamma';
+};
+
+const initInvaders = function () {
+  const { gridCols, invaderCols, invaderRows } = settings;
   const invaderOffsetX = (gridCols - invaderCols) / 2;
   const invaderOffsetY = 1;
+
+  return [...Array(invaderRows)]
+    .map(function (row, rowIndex) {
+      return [...Array(invaderCols)].map(function (col, colIndex) {
+        return {
+          type: invaderType(rowIndex),
+          x: colIndex + invaderOffsetX,
+          y: rowIndex + invaderOffsetY
+        };
+      });
+    })
+    .flat();
+};
+
+const gameState = store(function () {
+  const { gridCols, gridRows } = settings;
+  const colEnd = gridRows - 1;
 
   return {
     currentMenu: menu.controls,
@@ -51,13 +79,7 @@ const gameState = store(function () {
     defenderDirection: 0,
     projectiles: [],
     explosions: [],
-    invaders: [...Array(invaderRows)]
-      .map(function (row, rowIndex) {
-        return [...Array(invaderCols)].map(function (col, colIndex) {
-          return { x: colIndex + invaderOffsetX, y: rowIndex + invaderOffsetY };
-        });
-      })
-      .flat(),
+    invaders: initInvaders(),
     invadersDirection: 1
   };
 });
@@ -297,6 +319,7 @@ const invadersOutOfBoundsCollider = function () {
 
       invaders = invaders.map(function (invader) {
         return {
+          ...invader,
           x: invader.x + invadersDirection,
           y: invader.y + 1
         };
@@ -421,8 +444,8 @@ const spriteComponent = function ({ className, x, y }) {
   });
 };
 
-const invaderComponent = function ({ x, y }) {
-  return spriteComponent({ className: 'invader', x, y });
+const invaderComponent = function ({ type, x, y }) {
+  return spriteComponent({ className: `invader-${type}`, x, y });
 };
 
 const defenderComponent = function ({ x, y }) {
@@ -443,7 +466,7 @@ const worldLayerComponent = function ({
   explosions,
   defender
 }) {
-  return h('div.action-layer', [
+  return h('div.world-layer', [
     ...invaders.map(invaderComponent),
     ...projectiles.map(projectileComponent),
     ...explosions.map(explosionComponent),
