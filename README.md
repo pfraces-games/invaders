@@ -178,8 +178,7 @@ Fix known issues and implementation improvements.
 - [ ] Clear explosions on game end
   - Move game end conditions to state change event
   - Prevent state change events loop
-- [ ] Add defender explosion when invader reaches last row
-  - Remove invader if collides with defender
+- [ ] Remove defender when invader reaches last row
 - [ ] Replace `keyboard.reset` with keypress events
   - Improve keyboard bindings for menus
   - Improve screens management
