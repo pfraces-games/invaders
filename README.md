@@ -193,6 +193,8 @@ Fix known issues and implementation improvements.
   - 2nd row invaders: 20pts
   - 3rd row invaders: 30pts
 - [ ] Add mystery ship (100pts)
+- [ ] Add multiple stages increasing invaders velocity on each stage
+- [ ] Show credits when winning the game
 - [ ] Add high scores screen (needs server/firebase)
 - [ ] Add sound effects
 - [ ] Add background music
