@@ -45,17 +45,15 @@ It took **6 hours** of development with **346 LOC**.
 
 ## v0.2.0
 
-No more speed coding sessions for this project.
-
-I want to change the implementation by fixing some design failures.
-
-I want to implement a React-like render and some sort of game engine.
+- No more speed coding sessions for this project.
+- Change the implementation by fixing some design failures.
+- Implement a React-like render and some sort of game engine.
 
 ### Retrospective
 
 Game is finally complete!
 
-The code has been splitted in 3 files:
+**Source code stats:**
 
 - `hyperscript.js`: 42 LOC
 - `game-engine.js`: 101 LOC
@@ -84,15 +82,14 @@ The code has been splitted in 3 files:
 
 ## v0.3.0
 
-I want to extend the game engine with animations and collisions.
-
-Also, let's build a virtual dom engine!
+- Extend the game engine with animations and collisions.
+- Let's build a virtual dom engine!
 
 ### Retrospective
 
 Game is finally complete!
 
-The code has been splitted in 4 files:
+**Source code stats:**
 
 - `src/lib/fp.js`: 8 LOC
 - `src/lib/game-engine.js`: 96 LOC
@@ -125,17 +122,16 @@ Collision detection can be improved but is simple and do the job.
 
 ## v0.4.0
 
-I want to make the cell/grid size and the number of columns/rows fully customizable through the settings object.
-
-I want to improve graphics by adding sprites.
+- Make the cell/grid size and the number of columns/rows fully customizable through the settings object.
+- Improve graphics by adding sprites.
 
 ### Retrospective
 
 Full rewrite was not needed this time!
 
-I wanted to release this version even with known bugs and missing sprites because I wanted to publish with the recently added sprites and I want to publish only released versions
+I wanted to release this version even with known bugs and missing sprites because I wanted to publish with the recently added sprites and I want to publish only released versions.
 
-Source code stats:
+**Source code stats:**
 
 - `src/lib/fp.js`: 6 LOC
 - `src/lib/game-engine.js`: 149 LOC
@@ -148,7 +144,6 @@ Source code stats:
 - New key bindings system successfully removed the effect of movement freeze but added new challenges:
   - It makes difficult to move the defender a single cell
   - It had issues in menus so a `keyboard.reset` hack has been needed
-- Collision detection bug still persists
 
 ### Product changelog
 
@@ -164,42 +159,79 @@ Source code stats:
 - Moved key bindings management to game engine
 - Defender movement implemented as an animation
 
-## v0.5.0 (WIP)
+## v0.5.0
 
-Improve graphics by adding a canvas-generated space-themed background.
+- Add sound effects
 
-Fix known issues and implementation improvements.
+### Retrospective
+
+The original objectives for this release have been moved to the next one.
+
+I ended up looking for free game assets and researching about how to add sounds to the game.
+
+**Source code stats:**
+
+- `src/lib/fp.js`: 6 LOC
+- `src/lib/game-engine.js`: 170 LOC
+- `src/lib/store.js`: 33 LOC
+- `src/index.js`: 619 LOC
+
+**Highlights:**
+
+- Big impact on user experience by adding sound effects
+
+### Product changelog
+
+- Added explosion sprite
+- Added sound effects
+
+### Implementation changelog
+
+- Moved layout static node to the render pipeline
+
+## v0.6.0 (WIP)
+
+- Improve graphics by adding a space-themed background.
+- Fix known issues.
 
 ### TODO
 
-- [ ] Fix collision bug
-  - Bind animations to colliders
-  - Check collisions after applying bound animation
 - [ ] Clear explosions on game end
   - Move game end conditions to state change event
   - Prevent state change events loop
+- [ ] Fix collision bug
+  - Bind animations to colliders
+  - Check collisions after applying bound animation
 - [ ] Remove defender when invader reaches last row
-- [ ] Replace `keyboard.reset` with keypress events
-  - Improve keyboard bindings for menus
-  - Improve screens management
-- [ ] Move components to its own folder
 - [ ] Add space-themed background
 
 ## Backlog
+
+### v0.7.0
+
+- [ ] Replace `keyboard.reset` with keypress events
+  - Improve keyboard bindings for menus
+  - Improve screen management
+- [ ] Move components to its own folder
+
+### v0.8.0
 
 - [ ] Add score (3 invader types with different score points)
   - 1st row invaders: 10pts
   - 2nd row invaders: 20pts
   - 3rd row invaders: 30pts
 - [ ] Add mystery ship (100pts)
+
+### v0.9.0
+
+- [ ] Add high scores screen (needs server/firebase)
 - [ ] Add multiple stages increasing invaders velocity on each stage
 - [ ] Show credits when winning the game
-- [ ] Add high scores screen (needs server/firebase)
-- [ ] Add sound effects
-- [ ] Add background music
 
 ### N2H
 
+- [ ] Add config menu with sounds volumne and custom key bindings
+- [ ] Save user config in `localStorage`
 - [ ] Movement smooth transitions
 - [ ] Sprite animations
 - [ ] Sprite groups

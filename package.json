@@ -1,12 +1,12 @@
 {
-  "name": "space-invaders",
-  "version": "0.4.2",
-  "description": "Space invaders",
+  "name": "invaders",
+  "version": "0.5.0",
+  "description": "Grid-based browser game inspired by Space Invaders",
   "scripts": {
     "start": "snowpack dev",
     "build": "snowpack build"
   },
-  "author": "Pau Fracés <pfraces@gmail.com",
+  "author": "Pau Fracés <pfraces@gmail.com>",
   "license": "ISC",
   "devDependencies": {
     "eslint": "^7.28.0",
