@@ -203,7 +203,7 @@ keyboard.bind('Escape', onMenu(menu.gameover, reset));
 // Sounds
 // ------
 
-sound.load({ name: 'invader', url: './assets/invader.ogg', volume: 0.5 });
+sound.load({ name: 'invader', url: './assets/invader.ogg', volume: 0.3 });
 sound.load({ name: 'mystery-ship', url: './assets/mystery-ship.ogg' });
 sound.load({ name: 'fire', url: './assets/fire.ogg' });
 sound.load({ name: 'explosion', url: './assets/explosion.ogg' });
@@ -368,13 +368,16 @@ const invadersLandingCollider = {
       });
 
       let currentMenu = state.currentMenu;
+      let defender = state.defender;
 
       if (invaderLanded) {
         currentMenu = menu.gameover;
+        defender = null;
       }
 
       return {
         ...state,
+        defender,
         currentMenu
       };
     });
@@ -504,7 +507,7 @@ const worldLayerComponent = function ({
     ...invaders.map(invaderComponent),
     ...projectiles.map(projectileComponent),
     ...explosions.map(explosionComponent),
-    defenderComponent(defender)
+    defender && defenderComponent(defender)
   ]);
 };
 

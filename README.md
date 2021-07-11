@@ -203,6 +203,7 @@ Long standing collision bug was finally fixed!
 ### Product changelog
 
 - Improved projectile/invader collisions
+- Removed defender on game over
 
 ### Implementation changelog
 
@@ -211,22 +212,15 @@ Long standing collision bug was finally fixed!
 
 ### TODO
 
-- [ ] Clear explosions on game end
-  - Move game end conditions to state change event
-  - Prevent state change events loop
-- [ ] Remove defender when invader reaches last row
 - [ ] Add space-themed background
-
-## Backlog
-
-### v0.7.0
-
+- [ ] Improve screen management
 - [ ] Replace `keyboard.reset` with keypress events
   - Improve keyboard bindings for menus
-  - Improve screen management
 - [ ] Move components to its own folder
 
-### v0.8.0
+## Roadmap
+
+### v0.7.0
 
 - [ ] Add score (3 invader types with different score points)
   - 1st row invaders: 10pts
@@ -234,7 +228,7 @@ Long standing collision bug was finally fixed!
   - 3rd row invaders: 30pts
 - [ ] Add mystery ship (100pts)
 
-### v0.9.0
+### v0.8.0
 
 - [ ] Add high scores screen (needs server/firebase)
 - [ ] Add multiple stages increasing invaders velocity on each stage
