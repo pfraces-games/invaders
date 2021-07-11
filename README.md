@@ -196,14 +196,24 @@ I ended up looking for free game assets and researching about how to add sounds 
 - Improve graphics by adding a space-themed background.
 - Fix known issues.
 
+### Retrospective
+
+Long standing collision bug was finally fixed!
+
+### Product changelog
+
+- Improved projectile/invader collisions
+
+### Implementation changelog
+
+- Bound colliders to animations
+- Bound colliders are applied after animation update
+
 ### TODO
 
 - [ ] Clear explosions on game end
   - Move game end conditions to state change event
   - Prevent state change events loop
-- [ ] Fix collision bug
-  - Bind animations to colliders
-  - Check collisions after applying bound animation
 - [ ] Remove defender when invader reaches last row
 - [ ] Add space-themed background
 
@@ -232,6 +242,7 @@ I ended up looking for free game assets and researching about how to add sounds 
 
 ### N2H
 
+- [ ] `mount` vtree when all sounds are loaded
 - [ ] Add config menu with sounds volumne and custom key bindings
 - [ ] Save user config in `localStorage`
 - [ ] Movement smooth transitions

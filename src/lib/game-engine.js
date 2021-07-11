@@ -1,4 +1,6 @@
 import { init, styleModule } from 'snabbdom';
+import { invoke } from './fp';
+
 export { h } from 'snabbdom';
 
 const patch = init([styleModule]);
@@ -41,9 +43,7 @@ const applyKeyBindings = function () {
       return;
     }
 
-    keyBindings[key].forEach(function (listener) {
-      listener();
-    });
+    keyBindings[key].forEach(invoke);
   });
 };
 
@@ -59,8 +59,9 @@ export const keyboard = {
 const sounds = {};
 
 const loadSound = function ({ name, url, volume = 1 }) {
-  sounds[name] = new Audio(url);
-  sounds[name].volume = volume;
+  const sound = new Audio(url);
+  sound.volume = volume;
+  sounds[name] = sound;
 };
 
 const playSound = function (name) {
@@ -89,11 +90,13 @@ const stopAnimation = function () {
   isAnimationRunning = false;
 };
 
-const addAnimation = function (animation) {
+const addAnimation = function ({ name, velocity, update }) {
   animations.push({
-    ...animation,
-    timeLeft: animation.velocity(),
-    updated: false
+    name,
+    velocity,
+    update,
+    timeLeft: velocity(),
+    colliders: []
   });
 };
 
@@ -104,12 +107,11 @@ const applyAnimations = function (elapsed) {
 
   animations.forEach(function (animation) {
     animation.timeLeft -= elapsed;
-    animation.updated = false;
 
     if (animation.timeLeft <= 0) {
       animation.update();
+      animation.colliders.forEach(invoke);
       animation.timeLeft += animation.velocity();
-      animation.updated = true;
     }
   });
 };
@@ -124,16 +126,16 @@ export const animation = {
 // Colliders
 // ---------
 
-const colliders = [];
-
-const addCollider = function (collider) {
-  colliders.push(collider);
-};
-
-const applyColliders = function () {
-  colliders.forEach(function (collider) {
-    collider();
-  });
+const addCollider = function ({ animations: animationNames, response }) {
+  animationNames
+    .map(function (animationName) {
+      return animations.find(function ({ name }) {
+        return name === animationName;
+      });
+    })
+    .forEach(function ({ colliders }) {
+      colliders.push(response);
+    });
 };
 
 export const collider = {
@@ -154,7 +156,6 @@ export const mount = function (root, component) {
     if (timestamp > 0) {
       applyKeyBindings();
       applyAnimations(elapsed);
-      applyColliders();
     }
 
     const newVnode = component();
