@@ -1,5 +1,7 @@
 # Invaders
 
+Grid-based browser game inspired by Space Invaders
+
 <https://pfraces.github.io/invaders>
 
 ## v0.1.0

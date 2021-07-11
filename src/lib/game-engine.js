@@ -58,8 +58,9 @@ export const keyboard = {
 
 const sounds = {};
 
-const loadSound = function (name, file) {
-  sounds[name] = new Audio(file);
+const loadSound = function ({ name, url, volume = 1 }) {
+  sounds[name] = new Audio(url);
+  sounds[name].volume = volume;
 };
 
 const playSound = function (name) {

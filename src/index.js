@@ -203,10 +203,10 @@ keyboard.bind('Escape', onMenu(menu.gameover, reset));
 // Sounds
 // ------
 
-sound.load('invader', './assets/invader.ogg');
-sound.load('mystery-ship', './assets/mystery-ship.ogg');
-sound.load('fire', './assets/fire.ogg');
-sound.load('explosion', './assets/explosion.ogg');
+sound.load({ name: 'invader', url: './assets/invader.ogg', volume: 0.5 });
+sound.load({ name: 'mystery-ship', url: './assets/mystery-ship.ogg' });
+sound.load({ name: 'fire', url: './assets/fire.ogg' });
+sound.load({ name: 'explosion', url: './assets/explosion.ogg' });
 
 // ----------
 // Animations
