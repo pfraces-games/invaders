@@ -209,14 +209,18 @@ Long standing collision bug was finally fixed!
 
 - Bound colliders to animations
 - Bound colliders are applied after animation update
+- Decoupled components
+- Decoupled engine features
 
 ### TODO
 
-- [ ] Add space-themed background
-- [ ] Improve screen management
+- [ ] Replace flat matrix using division and module
 - [ ] Replace `keyboard.reset` with keypress events
+  - Improve screen management
   - Improve keyboard bindings for menus
-- [ ] Move components to its own folder
+- [ ] Prevent `onStateChange` infinite loop
+  - Disable state change events while emitting state changes
+- [ ] Add space-themed background
 
 ## Roadmap
 
@@ -227,22 +231,44 @@ Long standing collision bug was finally fixed!
   - 2nd row invaders: 20pts
   - 3rd row invaders: 30pts
 - [ ] Add mystery ship (100pts)
+- [ ] Add high scores screen (needs server/firebase)
 
 ### v0.8.0
 
-- [ ] Add high scores screen (needs server/firebase)
 - [ ] Add multiple stages increasing invaders velocity on each stage
 - [ ] Show credits when winning the game
 
-### N2H
+## Backlog
 
-- [ ] `mount` vtree when all sounds are loaded
+### Project
+
+- [ ] Replace relative imports with folder alias
+- [ ] Use CSS modules
+- [ ] Rewrite with TypeScript
+
+### Game
+
 - [ ] Add config menu with sounds volumne and custom key bindings
 - [ ] Save user config in `localStorage`
-- [ ] Movement smooth transitions
-- [ ] Sprite animations
-- [ ] Sprite groups
-- [ ] Actors composed by multiple sprites
+
+### Engine
+
+- [ ] Move game engine to its own repo
+- [ ] Hide shared state from engine modules with `init` wrappers
+- [ ] Decouple game loop from engine
+- [ ] Re-export `fp` and `store` from engine
+  - Use engine-only imports in game implementation
+- [ ] `mount` vtree when all sounds are loaded
+- [ ] Init key bindings on `mount`
+
+### Store
+
+- [ ] State updates using `immerjs`
 - [ ] Add state selectors to `withState` HOC
 - [ ] State reducers
 - [ ] Partial state updates
+
+### Misc
+
+- [ ] Sprite animations
+- [ ] Sprite groups
