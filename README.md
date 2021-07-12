@@ -30,7 +30,7 @@ Let's begin!
 
 Game is finally complete!
 
-It took **6 hours** of development with **346 LOC**.
+It took **6 hours** of development with **345 LOC**.
 
 **Higlights:**
 
@@ -57,9 +57,11 @@ Game is finally complete!
 
 **Source code stats:**
 
-- `hyperscript.js`: 42 LOC
-- `game-engine.js`: 101 LOC
-- `app.js`: 480 LOC
+- `hyperscript.js`: 41 LOC
+- `game-engine.js`: 100 LOC
+- `app.js`: 479 LOC
+
+A total of **620 LOC**
 
 **Higlights:**
 
@@ -93,10 +95,12 @@ Game is finally complete!
 
 **Source code stats:**
 
-- `src/lib/fp.js`: 8 LOC
-- `src/lib/game-engine.js`: 96 LOC
-- `src/lib/store.js`: 33 LOC
-- `src/index.js`: 500 LOC
+- `src/lib/fp.js`: 7 LOC
+- `src/lib/game-engine.js`: 95 LOC
+- `src/lib/store.js`: 32 LOC
+- `src/index.js`: 499 LOC
+
+A total of **633 LOC**
 
 **Highlights:**
 
@@ -135,10 +139,12 @@ I wanted to release this version even with known bugs and missing sprites becaus
 
 **Source code stats:**
 
-- `src/lib/fp.js`: 6 LOC
-- `src/lib/game-engine.js`: 149 LOC
-- `src/lib/store.js`: 33 LOC
-- `src/index.js`: 581 LOC
+- `src/lib/fp.js`: 5 LOC
+- `src/lib/game-engine.js`: 148 LOC
+- `src/lib/store.js`: 32 LOC
+- `src/index.js`: 580 LOC
+
+A total of **765 LOC**
 
 **Highlights:**
 
@@ -173,10 +179,12 @@ I ended up looking for free game assets and researching about how to add sounds 
 
 **Source code stats:**
 
-- `src/lib/fp.js`: 6 LOC
-- `src/lib/game-engine.js`: 170 LOC
-- `src/lib/store.js`: 33 LOC
-- `src/index.js`: 619 LOC
+- `src/lib/fp.js`: 5 LOC
+- `src/lib/game-engine.js`: 169 LOC
+- `src/lib/store.js`: 32 LOC
+- `src/index.js`: 618 LOC
+
+A total of **824 LOC**
 
 **Highlights:**
 
@@ -201,6 +209,24 @@ I ended up looking for free game assets and researching about how to add sounds 
 Long standing collision bug was finally fixed!
 
 This release was mainly a refactor.
+
+**Source code stats:**
+
+- `src/components/layout-component.js`: 32 LOC
+- `src/components/menu-layer-component.js`: 83 LOC
+- `src/components/root-component.js`: 6 LOC
+- `src/components/sprite-component.js`: 15 LOC
+- `src/components/world-layer-component.js`: 32 LOC
+- `src/lib/animation.js`: 45 LOC
+- `src/lib/collider.js`: 8 LOC
+- `src/lib/fp.js`: 11 LOC
+- `src/lib/game-engine.js`: 85 LOC
+- `src/lib/keyboard.js`: 41 LOC
+- `src/lib/sound.js`: 13 LOC
+- `src/lib/store.js`: 43 LOC
+- `src/index.js`: 437 LOC
+
+A total of **851 LOC**
 
 **Highlights:**
 
@@ -257,6 +283,7 @@ This release was mainly a refactor.
 
 ### Game
 
+- [ ] Quit current game from game pause menu
 - [ ] Add config menu with sounds volumne and custom key bindings
 - [ ] Save user config in `localStorage`
 

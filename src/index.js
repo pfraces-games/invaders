@@ -45,6 +45,7 @@ const gameState = store(function () {
 
   return {
     currentMenu: menu.controls,
+    score: 0,
     defender: {
       x: Math.ceil(gridCols / 2) - 1,
       y: colEnd
