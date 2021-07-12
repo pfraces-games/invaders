@@ -434,3 +434,4 @@ onStateChange(function ({ currentMenu }) {
 // ----
 
 mount(document.getElementById('root'), withState(rootComponent));
+keyboard.listen();

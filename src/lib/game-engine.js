@@ -1,5 +1,10 @@
 import { init, styleModule } from 'snabbdom';
-import { resetPressedKeys, addKeyBinding, applyKeyBindings } from './keyboard';
+import {
+  addKeyBinding,
+  applyKeyBindings,
+  resetPressedKeys,
+  listenKeyboard
+} from './keyboard';
 import { loadSound, playSound } from './sound';
 import {
   runAnimation,
@@ -18,8 +23,9 @@ const patch = init([styleModule]);
 // --------
 
 export const keyboard = {
+  bind: addKeyBinding,
   reset: resetPressedKeys,
-  bind: addKeyBinding
+  listen: listenKeyboard
 };
 
 // -----

@@ -226,12 +226,7 @@ This release was mainly a refactor.
 
 ### TODO
 
-- [ ] Hide shared state from engine modules with `init` wrappers
-- [ ] Decouple game loop from engine
 - [ ] `mount` vtree when all sounds are loaded
-- [ ] Init key bindings on `mount`
-- [ ] Re-export `fp` and `store` from engine
-  - Use engine-only imports in game implementation
 - [ ] Replace `keyboard.reset` with keypress events
   - Improve screen management
   - Improve keyboard bindings for menus
@@ -268,6 +263,11 @@ This release was mainly a refactor.
 
 ### Engine
 
+- [ ] Export an `init` method with `mount` and `keyboard.listen()`
+- [ ] Hide shared state from engine modules with `init` wrappers
+- [ ] Decouple game loop from engine
+- [ ] Re-export `fp` and `store` from engine
+  - Use engine-only imports in game implementation
 - [ ] Move game engine to its own repo
 - [ ] Add API documentation
 - [ ] Change animation/collider API to prevent loading colliders before animations
