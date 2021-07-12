@@ -255,12 +255,17 @@ A total of **851 LOC**
 
 - Add score
 
-### TODO
+### Product changelog
 
-- [ ] Add score depending on invader type
+- Added score component
+- Incremented score depending on invader type
   - `gamma` invaders: 10pts
   - `beta` invaders: 20pts
   - `alfa` invaders: 30pts
+
+### TODO
+
+- [ ] Export related groups of settings
 - [ ] Add mystery ship (100pts)
 - [ ] Add high scores screen (needs server/firebase)
 
@@ -304,6 +309,8 @@ A total of **851 LOC**
 ### Collider
 
 - [ ] Add `detect` method to separate collision detection and response
+  - `detect` returs a collision or an array of collisions
+  - `respond` is only called if collisions have been detected and receives the `detect` output
 
 ### Store
 
