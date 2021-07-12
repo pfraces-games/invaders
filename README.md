@@ -200,6 +200,15 @@ I ended up looking for free game assets and researching about how to add sounds 
 
 Long standing collision bug was finally fixed!
 
+This release was mainly a refactor.
+
+**Highlights:**
+
+- Dynamic background generation has been discarded to prevent multiple rendering
+  pipelines
+- Components have been moved to its own folder and splitted in several files
+- Engine have been splitted in several modules
+
 ### Product changelog
 
 - Improved projectile/invader collisions
@@ -213,14 +222,19 @@ Long standing collision bug was finally fixed!
 - Decoupled components
 - Decoupled engine features
 - Rewritten invaders initialization with division and module
+- Prevented `onStateChange` infinite loop
 
 ### TODO
 
+- [ ] Hide shared state from engine modules with `init` wrappers
+- [ ] Decouple game loop from engine
+- [ ] `mount` vtree when all sounds are loaded
+- [ ] Init key bindings on `mount`
+- [ ] Re-export `fp` and `store` from engine
+  - Use engine-only imports in game implementation
 - [ ] Replace `keyboard.reset` with keypress events
   - Improve screen management
   - Improve keyboard bindings for menus
-- [ ] Prevent `onStateChange` infinite loop
-  - Disable state change events while emitting state changes
 
 ## Roadmap
 
@@ -236,6 +250,7 @@ Long standing collision bug was finally fixed!
 ### v0.8.0
 
 - [ ] Add multiple stages increasing invaders velocity on each stage
+  - Change scene init by using a matrix
 - [ ] Show credits when winning the game
 
 ## Backlog
@@ -254,12 +269,12 @@ Long standing collision bug was finally fixed!
 ### Engine
 
 - [ ] Move game engine to its own repo
-- [ ] Hide shared state from engine modules with `init` wrappers
-- [ ] Decouple game loop from engine
-- [ ] Re-export `fp` and `store` from engine
-  - Use engine-only imports in game implementation
-- [ ] `mount` vtree when all sounds are loaded
-- [ ] Init key bindings on `mount`
+- [ ] Add API documentation
+- [ ] Change animation/collider API to prevent loading colliders before animations
+
+### Collider
+
+- [ ] Add `detect` method to separate collision detection and response
 
 ### Store
 

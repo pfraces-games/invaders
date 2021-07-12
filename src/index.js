@@ -250,7 +250,7 @@ animation.add(projectilesAnimation);
 
 const defenderOutOfBoundsCollider = {
   animations: ['defender'],
-  response: function () {
+  respond: function () {
     const { gridCols } = settings;
     const rowStart = 0;
     const rowEnd = gridCols - 1;
@@ -279,7 +279,7 @@ const defenderOutOfBoundsCollider = {
 
 const invadersOutOfBoundsCollider = {
   animations: ['invaders'],
-  response: function () {
+  respond: function () {
     const { gridCols } = settings;
     const rowStart = 0;
     const rowEnd = gridCols - 1;
@@ -323,7 +323,7 @@ const invadersOutOfBoundsCollider = {
 
 const invadersLandingCollider = {
   animations: ['invaders'],
-  response: function () {
+  respond: function () {
     setState(function (state) {
       const { gridRows } = settings;
       const colEnd = gridRows - 1;
@@ -351,7 +351,7 @@ const invadersLandingCollider = {
 
 const projectilesOutOfBoundsCollider = {
   animations: ['projectiles'],
-  response: function () {
+  respond: function () {
     setState(function (state) {
       return {
         ...state,
@@ -365,7 +365,7 @@ const projectilesOutOfBoundsCollider = {
 
 const projectilesHitCollider = {
   animations: ['projectiles', 'invaders'],
-  response: function () {
+  respond: function () {
     const collisions = getState(function (state) {
       const { invaders, projectiles } = state;
 
