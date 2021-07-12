@@ -28,6 +28,7 @@ body {
 .canvas {
   position: relative;
   overflow: hidden;
+  background-image: url(./assets/space-background.png);
 }
 
 .world-layer {
