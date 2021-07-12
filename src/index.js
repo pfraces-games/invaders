@@ -23,20 +23,20 @@ const invaderType = function (row) {
 
 const initInvaders = function () {
   const { gridCols, invaderCols, invaderRows } = settings;
+  const invaderCells = invaderRows * invaderCols;
   const invaderOffsetX = (gridCols - invaderCols) / 2;
   const invaderOffsetY = 1;
 
-  return [...Array(invaderRows)]
-    .map(function (row, rowIndex) {
-      return [...Array(invaderCols)].map(function (col, colIndex) {
-        return {
-          type: invaderType(rowIndex),
-          x: colIndex + invaderOffsetX,
-          y: rowIndex + invaderOffsetY
-        };
-      });
-    })
-    .flat();
+  return [...Array(invaderCells)].map(function (_, index) {
+    const rowIndex = Math.floor(index / invaderCols);
+    const colIndex = index % invaderCols;
+
+    return {
+      type: invaderType(rowIndex),
+      x: colIndex + invaderOffsetX,
+      y: rowIndex + invaderOffsetY
+    };
+  });
 };
 
 const gameState = store(function () {

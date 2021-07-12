@@ -204,6 +204,7 @@ Long standing collision bug was finally fixed!
 
 - Improved projectile/invader collisions
 - Removed defender on game over
+- Added space-themed background
 
 ### Implementation changelog
 
@@ -211,16 +212,15 @@ Long standing collision bug was finally fixed!
 - Bound colliders are applied after animation update
 - Decoupled components
 - Decoupled engine features
+- Rewritten invaders initialization with division and module
 
 ### TODO
 
-- [ ] Replace flat matrix using division and module
 - [ ] Replace `keyboard.reset` with keypress events
   - Improve screen management
   - Improve keyboard bindings for menus
 - [ ] Prevent `onStateChange` infinite loop
   - Disable state change events while emitting state changes
-- [ ] Add space-themed background
 
 ## Roadmap
 
