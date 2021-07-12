@@ -191,7 +191,7 @@ I ended up looking for free game assets and researching about how to add sounds 
 
 - Moved layout static node to the render pipeline
 
-## v0.6.0 (WIP)
+## v0.6.0
 
 - Improve graphics by adding a space-themed background.
 - Fix known issues.
@@ -223,27 +223,26 @@ This release was mainly a refactor.
 - Decoupled engine features
 - Rewritten invaders initialization with division and module
 - Prevented `onStateChange` infinite loop
+- Added explicit keyboard initialization
+
+## v0.7.0 (WIP)
+
+- Add score
 
 ### TODO
 
-- [ ] `mount` vtree when all sounds are loaded
-- [ ] Replace `keyboard.reset` with keypress events
-  - Improve screen management
-  - Improve keyboard bindings for menus
-
-## Roadmap
-
-### v0.7.0
-
-- [ ] Add score (3 invader types with different score points)
-  - 1st row invaders: 10pts
-  - 2nd row invaders: 20pts
-  - 3rd row invaders: 30pts
+- [ ] Add score depending on invader type
+  - `gamma` invaders: 10pts
+  - `beta` invaders: 20pts
+  - `alfa` invaders: 30pts
 - [ ] Add mystery ship (100pts)
 - [ ] Add high scores screen (needs server/firebase)
 
+## Roadmap
+
 ### v0.8.0
 
+- [ ] Improve screen management
 - [ ] Add multiple stages increasing invaders velocity on each stage
   - Change scene init by using a matrix
 - [ ] Show credits when winning the game
@@ -263,6 +262,9 @@ This release was mainly a refactor.
 
 ### Engine
 
+- [ ] `mount` vtree when all sounds are loaded
+- [ ] Replace `keyboard.reset` with keypress events
+  - Improve keyboard bindings for menus
 - [ ] Export an `init` method with `mount` and `keyboard.listen()`
 - [ ] Hide shared state from engine modules with `init` wrappers
 - [ ] Decouple game loop from engine
