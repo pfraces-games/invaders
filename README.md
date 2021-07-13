@@ -268,6 +268,7 @@ A total of **851 LOC**
 - Grouped settings
 - Added `vdom` engine module
 - Moved game engine and its modules to its own folder
+- Removed engine dependency on fp lib
 
 ### TODO
 
