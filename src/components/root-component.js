@@ -1,4 +1,4 @@
-import { h } from '../lib/game-engine';
+import { h } from '../lib/engine/engine';
 import { layoutComponent } from './layout-component';
 
 export const rootComponent = function ({ state }) {

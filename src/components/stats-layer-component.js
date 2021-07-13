@@ -1,4 +1,4 @@
-import { h } from '../lib/game-engine';
+import { h } from '../lib/engine/engine';
 import { lcdComponent } from './lcd-component';
 
 const scoreComponent = function ({ score }) {

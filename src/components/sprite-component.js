@@ -1,4 +1,4 @@
-import { h } from '../lib/game-engine';
+import { h } from '../lib/engine/engine';
 import { settings } from '../settings';
 
 export const spriteComponent = function ({ className, x, y }) {

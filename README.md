@@ -267,10 +267,13 @@ A total of **851 LOC**
 
 - Grouped settings
 - Added `vdom` engine module
+- Moved game engine and its modules to its own folder
 
 ### TODO
 
 - [ ] Add mystery ship (100pts)
+- [ ] Change animation/collider API to prevent loading colliders before animations
+  - Decouple animations from colliders
 - [ ] Improve screen management
 - [ ] Add config menu with sounds volumne and custom key bindings
   - Volume off by default
@@ -308,7 +311,6 @@ A total of **851 LOC**
 - [ ] Decouple game loop from engine
 - [ ] Move game engine to its own repo
 - [ ] Add API documentation
-- [ ] Change animation/collider API to prevent loading colliders before animations
 
 ### Collider
 

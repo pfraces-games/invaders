@@ -1,4 +1,4 @@
-import { h } from '../lib/game-engine';
+import { h } from '../lib/engine/engine';
 import { spriteComponent } from './sprite-component';
 
 const invaderComponent = function ({ type, x, y }) {

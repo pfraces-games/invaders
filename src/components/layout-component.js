@@ -1,4 +1,4 @@
-import { h } from '../lib/game-engine';
+import { h } from '../lib/engine/engine';
 import { settings } from '../settings';
 import { worldLayerComponent } from './word-layer-component';
 import { statsLayerComponent } from './stats-layer-component';

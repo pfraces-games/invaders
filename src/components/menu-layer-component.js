@@ -1,4 +1,4 @@
-import { h } from '../lib/game-engine';
+import { h } from '../lib/engine/engine';
 import { constant } from '../lib/fp';
 import { menu } from '../model';
 import { settings } from '../settings';

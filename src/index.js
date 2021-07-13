@@ -1,4 +1,10 @@
-import { keyboard, sound, animation, collider, mount } from './lib/game-engine';
+import {
+  keyboard,
+  sound,
+  animation,
+  collider,
+  mount
+} from './lib/engine/engine';
 import { store } from './lib/store';
 import { constant } from './lib/fp';
 import { menu, invaderType } from './model';
