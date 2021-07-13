@@ -1,4 +1,3 @@
-import { init, styleModule } from 'snabbdom';
 import {
   addKeyBinding,
   applyKeyBindings,
@@ -13,14 +12,9 @@ import {
   applyAnimations
 } from './animation';
 import { addCollider } from './collider';
+import { patch } from './vdom';
 
-export { h } from 'snabbdom';
-
-const patch = init([styleModule]);
-
-// --------
-// Keyboard
-// --------
+export { h } from './vdom';
 
 export const keyboard = {
   bind: addKeyBinding,
@@ -28,18 +22,10 @@ export const keyboard = {
   listen: listenKeyboard
 };
 
-// -----
-// Sound
-// -----
-
 export const sound = {
   load: loadSound,
   play: playSound
 };
-
-// ---------
-// Animation
-// ---------
 
 export const animation = {
   run: runAnimation,
@@ -47,17 +33,9 @@ export const animation = {
   add: addAnimation
 };
 
-// --------
-// Collider
-// --------
-
 export const collider = {
   add: addCollider
 };
-
-// ---------
-// Game loop
-// ---------
 
 export const mount = function (root, component) {
   let vnode = component();

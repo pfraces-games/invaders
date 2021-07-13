@@ -266,6 +266,7 @@ A total of **851 LOC**
 ### Implementation changelog
 
 - Grouped settings
+- Added `vdom` engine module
 
 ### TODO
 
@@ -305,8 +306,6 @@ A total of **851 LOC**
 - [ ] Export an `init` method with `mount` and `keyboard.listen()`
 - [ ] Hide shared state from engine modules with `init` wrappers
 - [ ] Decouple game loop from engine
-- [ ] Re-export `fp` and `store` from engine
-  - Use engine-only imports in game implementation
 - [ ] Move game engine to its own repo
 - [ ] Add API documentation
 - [ ] Change animation/collider API to prevent loading colliders before animations
@@ -327,5 +326,6 @@ A total of **851 LOC**
 
 ### Misc
 
+- [ ] Sprite smooth movement
 - [ ] Sprite animations
 - [ ] Sprite groups
