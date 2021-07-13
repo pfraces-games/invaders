@@ -263,17 +263,23 @@ A total of **851 LOC**
   - `beta` invaders: 20pts
   - `alfa` invaders: 30pts
 
+### Implementation changelog
+
+- Grouped settings
+
 ### TODO
 
-- [ ] Export related groups of settings
 - [ ] Add mystery ship (100pts)
+- [ ] Improve screen management
+- [ ] Add config menu with sounds volumne and custom key bindings
+  - Volume off by default
+  - Save user config in `localStorage`
 - [ ] Add high scores screen (needs server/firebase)
 
 ## Roadmap
 
 ### v0.8.0
 
-- [ ] Improve screen management
 - [ ] Add multiple stages increasing invaders velocity on each stage
   - Change scene init by using a matrix
 - [ ] Show credits when winning the game
@@ -283,14 +289,13 @@ A total of **851 LOC**
 ### Project
 
 - [ ] Replace relative imports with folder alias
+- [ ] Production build
 - [ ] Use CSS modules
 - [ ] Rewrite with TypeScript
 
 ### Game
 
 - [ ] Quit current game from game pause menu
-- [ ] Add config menu with sounds volumne and custom key bindings
-- [ ] Save user config in `localStorage`
 
 ### Engine
 
@@ -315,6 +320,7 @@ A total of **851 LOC**
 ### Store
 
 - [ ] State updates using `immerjs`
+- [ ] Partial component rendering
 - [ ] Add state selectors to `withState` HOC
 - [ ] State reducers
 - [ ] Partial state updates

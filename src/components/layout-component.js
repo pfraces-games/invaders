@@ -5,7 +5,8 @@ import { statsLayerComponent } from './stats-layer-component';
 import { menuLayerComponent } from './menu-layer-component';
 
 const canvasComponent = function ({ state }) {
-  const { fontSize, cellSize, gridCols, gridRows } = settings;
+  const { cellSize, cols, rows } = settings.grid;
+  const { fontSize } = settings.theme;
   const { currentMenu, score, invaders, projectiles, explosions, defender } =
     state;
 
@@ -14,8 +15,8 @@ const canvasComponent = function ({ state }) {
     {
       style: {
         fontSize,
-        width: `calc(${cellSize} * ${gridCols})`,
-        height: `calc(${cellSize} * ${gridRows})`
+        width: `calc(${cellSize} * ${cols})`,
+        height: `calc(${cellSize} * ${rows})`
       }
     },
     [

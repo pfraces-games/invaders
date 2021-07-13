@@ -47,13 +47,11 @@ const lcdNumber = function (number) {
 };
 
 export const lcdComponent = function ({ number }) {
-  const { fontSize } = settings;
-
   return h(
     'pre.lcd',
     {
       style: {
-        fontSize: `calc(${fontSize} * 0.5)`
+        fontSize: `calc(${settings.theme.fontSize} * 0.5)`
       }
     },
     lcdNumber(number)

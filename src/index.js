@@ -2,7 +2,7 @@ import { mount, keyboard, sound, animation, collider } from './lib/game-engine';
 import { store } from './lib/store';
 import { constant } from './lib/fp';
 import { menu, invaderType } from './model';
-import { settings, invaderScore } from './settings';
+import { settings } from './settings';
 import { rootComponent } from './components/root-component';
 
 // -----
@@ -22,9 +22,10 @@ const invaderTypeByRow = function (row) {
 };
 
 const initInvaders = function () {
-  const { gridCols, invaderCols, invaderRows } = settings;
+  const { cols } = settings.grid;
+  const { invaderCols, invaderRows } = settings.scene;
   const invaderCells = invaderRows * invaderCols;
-  const invaderOffsetX = (gridCols - invaderCols) / 2;
+  const invaderOffsetX = (cols - invaderCols) / 2;
   const invaderOffsetY = 1;
 
   return [...Array(invaderCells)].map(function (_, index) {
@@ -40,15 +41,15 @@ const initInvaders = function () {
 };
 
 const gameState = store(function () {
-  const { gridCols, gridRows } = settings;
-  const colEnd = gridRows - 1;
+  const { cols, rows } = settings.grid;
+  const rowEnd = rows - 1;
 
   return {
     currentMenu: menu.controls,
     score: 0,
     defender: {
-      x: Math.ceil(gridCols / 2) - 1,
-      y: colEnd
+      x: Math.ceil(cols / 2) - 1,
+      y: rowEnd
     },
     defenderDirection: 0,
     projectiles: [],
@@ -110,16 +111,16 @@ const moveDefenderRight = function () {
 };
 
 const fire = function () {
-  const { maxConcurrentProjectiles } = settings;
+  const { maxConcurrency, cooldown } = settings.projectile;
 
   const canFire = getState(function (state) {
     const { defender, projectiles } = state;
 
     const projectileOverlap = projectiles.find(function (projectile) {
-      return projectile.y === defender.y - 1;
+      return projectile.y >= defender.y - (1 + cooldown);
     });
 
-    return !projectileOverlap && projectiles.length < maxConcurrentProjectiles;
+    return !projectileOverlap && projectiles.length < maxConcurrency;
   });
 
   if (!canFire) {
@@ -180,7 +181,7 @@ sound.load({ name: 'explosion', url: './assets/explosion.ogg' });
 
 const defenderAnimation = {
   name: 'defender',
-  velocity: constant(settings.defenderVelocity),
+  velocity: constant(settings.defender.velocity),
   update: function () {
     setState(function (state) {
       return {
@@ -198,11 +199,10 @@ const defenderAnimation = {
 const invadersAnimation = {
   name: 'invaders',
   velocity: function () {
-    const { invadersMinVelocity, invadersIncrementVelocity } = settings;
+    const { minVelocity, incrementVelocity } = settings.invader;
 
-    return getState(function (state) {
-      const invadersLength = state.invaders.length;
-      return invadersMinVelocity + invadersLength * invadersIncrementVelocity;
+    return getState(function ({ invaders }) {
+      return minVelocity + invaders.length * incrementVelocity;
     });
   },
   update: function () {
@@ -225,7 +225,7 @@ const invadersAnimation = {
 
 const projectilesAnimation = {
   name: 'projectiles',
-  velocity: constant(settings.projectilesVelocity),
+  velocity: constant(settings.projectile.velocity),
   update: function () {
     setState(function (state) {
       return {
@@ -252,9 +252,8 @@ animation.add(projectilesAnimation);
 const defenderOutOfBoundsCollider = {
   animations: ['defender'],
   respond: function () {
-    const { gridCols } = settings;
     const rowStart = 0;
-    const rowEnd = gridCols - 1;
+    const rowEnd = settings.grid.cols - 1;
 
     setState(function (state) {
       let x = state.defender.x;
@@ -281,9 +280,8 @@ const defenderOutOfBoundsCollider = {
 const invadersOutOfBoundsCollider = {
   animations: ['invaders'],
   respond: function () {
-    const { gridCols } = settings;
     const rowStart = 0;
-    const rowEnd = gridCols - 1;
+    const rowEnd = settings.grid.cols - 1;
 
     setState(function (state) {
       if (!state.invaders.length) {
@@ -326,11 +324,10 @@ const invadersLandingCollider = {
   animations: ['invaders'],
   respond: function () {
     setState(function (state) {
-      const { gridRows } = settings;
-      const colEnd = gridRows - 1;
+      const rowEnd = settings.grid.rows - 1;
 
       const invaderLanded = state.invaders.some(function (invader) {
-        return invader.y === colEnd;
+        return invader.y === rowEnd;
       });
 
       let currentMenu = state.currentMenu;
@@ -384,7 +381,7 @@ const projectilesHitCollider = {
     sound.play('explosion');
 
     const scoreIncrement = collisions.reduce(function (acc, collision) {
-      return acc + invaderScore[collision.type];
+      return acc + settings.score.invaderType[collision.type];
     }, 0);
 
     setState(function (state) {

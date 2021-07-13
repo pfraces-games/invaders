@@ -4,13 +4,11 @@ import { menu } from '../model';
 import { settings } from '../settings';
 
 const menuTitleComponent = function () {
-  const { fontSize } = settings;
-
   return h(
     'pre.menu-title',
     {
       style: {
-        fontSize: `calc(${fontSize} * 0.75)`
+        fontSize: `calc(${settings.theme.fontSize} * 0.75)`
       }
     },
     [
