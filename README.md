@@ -250,9 +250,10 @@ A total of **851 LOC**
 - Prevented `onStateChange` infinite loop
 - Added explicit keyboard initialization
 
-## v0.7.0 (WIP)
+## v0.7.0
 
 - Add score
+- Add the mystery ship
 
 ### Retrospective
 
@@ -260,6 +261,7 @@ Welcome mystery ship!
 
 **Highlights:**
 
+- More than 1K lines of code (over 100 LOC to add mystery ship)
 - Nice looking score component
 - The mystery ship implementation needed features not yet implemented in the engine:
   - Spawning animations at specific time interval
@@ -305,19 +307,20 @@ A total of **1029 LOC**
 - Removed state change notifications
 - Added sound loops
 
+## v0.8.0
+
+- Add high scores menu
+
 ### TODO
 
-- [ ] Improve sounds balance
-
-## Roadmap
-
-### v0.8.0
-
 - [ ] Improve screen management
+- [ ] Improve sounds balance
 - [ ] Add config menu with sounds volumne and custom key bindings
   - Volume off by default
   - Save user config in `localStorage`
 - [ ] Add high scores screen (needs server/firebase)
+
+## Roadmap
 
 ### v0.9.0
 
