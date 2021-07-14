@@ -44,3 +44,9 @@ export const applyAnimations = function (elapsed) {
     }
   });
 };
+
+export const resetAnimations = function () {
+  animations.forEach(function (animation) {
+    animation.timeLeft = animation.velocity();
+  });
+};

@@ -12,6 +12,7 @@ export const settings = {
     invaderRows: 5
   },
   score: {
+    mysteryShip: 100,
     invaderType: {
       alfa: 30,
       beta: 20,
@@ -29,5 +30,9 @@ export const settings = {
     velocity: 50,
     maxConcurrency: 1,
     cooldown: 0
+  },
+  mysteryShip: {
+    velocity: 250,
+    spawnVelocity: 15000
   }
 };

@@ -30,7 +30,7 @@ Let's begin!
 
 Game is finally complete!
 
-It took **6 hours** of development with **345 LOC**.
+It took **6 hours** of development with **345 LOC** in a single file.
 
 **Higlights:**
 
@@ -53,7 +53,13 @@ It took **6 hours** of development with **345 LOC**.
 
 ### Retrospective
 
-Game is finally complete!
+Complete rewrite with React-like components! (no virtual dom though)
+
+**Higlights:**
+
+- Missing dev tools (app bundler and app server)
+- Missing game engine management of animations and collisions
+- Missing a virtual dom engine
 
 **Source code stats:**
 
@@ -63,12 +69,6 @@ Game is finally complete!
 
 A total of **620 LOC**
 
-**Higlights:**
-
-- Missing dev tools (app bundler and app server)
-- Missing game engine management of animations and collisions
-- Missing a virtual dom engine
-
 ### Product changelog
 
 - Removed the invader landing and defender dead styles to simplify implementation.
@@ -76,7 +76,7 @@ A total of **620 LOC**
 
 ### Implementation changelog
 
-- Added `editorConfig` and `eslint` development tools
+- Added `editorConfig`, `eslint` and `prettier` development tools
 - Pure render functions
 - Added status bar to the render pipeline
 - Simplified tiles positioning by using `position: absolute`
@@ -91,7 +91,14 @@ A total of **620 LOC**
 
 ### Retrospective
 
-Game is finally complete!
+Welcome [snabbdom](https://github.com/snabbdom/snabbdom)!
+
+**Highlights:**
+
+- I had fun trying to implement a virtual dom engine but the diff algorithm was a lot harder than I though
+- Snabbdom virtual dom library has been added
+- State management has been decoupled from the game engine which make implementation simpler
+- Collision detection can be improved but it is simple enough to do the job
 
 **Source code stats:**
 
@@ -101,14 +108,6 @@ Game is finally complete!
 - `src/index.js`: 499 LOC
 
 A total of **633 LOC**
-
-**Highlights:**
-
-I had fun trying to implement a virtual dom engine but the diff algorithm was a lot harder than I though so I ended up using a 3rd party implementation.
-
-While migrating to virtual dom, the state management has been decoupled from the game engine which make implementation simpler.
-
-Collision detection can be improved but is simple and do the job.
 
 ### Product changelog
 
@@ -137,6 +136,13 @@ Full rewrite was not needed this time!
 
 I wanted to release this version even with known bugs and missing sprites because I wanted to publish with the recently added sprites and I want to publish only released versions.
 
+**Highlights:**
+
+- Impressive impact on user experience by adding sprites!
+- New key bindings system successfully removed the effect of movement freeze but added new challenges:
+  - It makes difficult to move the defender a single cell
+  - It had issues in menus so a `keyboard.reset` hack has been needed
+
 **Source code stats:**
 
 - `src/lib/fp.js`: 5 LOC
@@ -145,13 +151,6 @@ I wanted to release this version even with known bugs and missing sprites becaus
 - `src/index.js`: 580 LOC
 
 A total of **765 LOC**
-
-**Highlights:**
-
-- Impressive impact on user experience by adding sprites!
-- New key bindings system successfully removed the effect of movement freeze but added new challenges:
-  - It makes difficult to move the defender a single cell
-  - It had issues in menus so a `keyboard.reset` hack has been needed
 
 ### Product changelog
 
@@ -177,6 +176,10 @@ The original objectives for this release have been moved to the next one.
 
 I ended up looking for free game assets and researching about how to add sounds to the game.
 
+**Highlights:**
+
+- Big impact on user experience by adding sound effects
+
 **Source code stats:**
 
 - `src/lib/fp.js`: 5 LOC
@@ -185,10 +188,6 @@ I ended up looking for free game assets and researching about how to add sounds 
 - `src/index.js`: 618 LOC
 
 A total of **824 LOC**
-
-**Highlights:**
-
-- Big impact on user experience by adding sound effects
 
 ### Product changelog
 
@@ -210,6 +209,13 @@ Long standing collision bug was finally fixed!
 
 This release was mainly a refactor.
 
+**Highlights:**
+
+- Dynamic background generation has been discarded to prevent multiple rendering
+  pipelines (DOM vs canvas)
+- Components have been moved to its own folder and splitted in several files
+- Engine have been splitted in several modules
+
 **Source code stats:**
 
 - `src/components/layout-component.js`: 32 LOC
@@ -227,13 +233,6 @@ This release was mainly a refactor.
 - `src/index.js`: 437 LOC
 
 A total of **851 LOC**
-
-**Highlights:**
-
-- Dynamic background generation has been discarded to prevent multiple rendering
-  pipelines
-- Components have been moved to its own folder and splitted in several files
-- Engine have been splitted in several modules
 
 ### Product changelog
 
@@ -255,6 +254,39 @@ A total of **851 LOC**
 
 - Add score
 
+### Retrospective
+
+Welcome mystery ship!
+
+**Highlights:**
+
+- Nice looking score component
+- The mystery ship implementation needed features not yet implemented in the engine:
+  - Spawning animations at specific time interval
+  - Sound loop and stop
+- The removal of `onStateChange` required animations and sound loops management to be repeated in several parts
+
+**Source code stats:**
+
+- `src/components/layout-component.js`: 50 LOC
+- `src/components/lcd-component.js`: 59 LOC
+- `src/components/menu-layer-component.js`: 81 LOC
+- `src/components/root-component.js`: 6 LOC
+- `src/components/sprite-component.js`: 15 LOC
+- `src/components/stats-layer-component.js`: 9 LOC
+- `src/components/world-layer-component.js`: 38 LOC
+- `src/lib/engine/animation.js`: 52 LOC
+- `src/lib/engine/collider.js`: 7 LOC
+- `src/lib/engine/engine.js`: 65 LOC
+- `src/lib/engine/keyboard.js`: 42 LOC
+- `src/lib/engine/sound.js`: 21 LOC
+- `src/lib/engine/vdom.js`: 5 LOC
+- `src/lib/fp.js`: 5 LOC
+- `src/lib/store.js`: 23 LOC
+- `src/index.js`: 551 LOC
+
+A total of **1029 LOC**
+
 ### Product changelog
 
 - Added score component
@@ -262,6 +294,7 @@ A total of **851 LOC**
   - `gamma` invaders: 10pts
   - `beta` invaders: 20pts
   - `alfa` invaders: 30pts
+- Added mystery ship (100pts)
 
 ### Implementation changelog
 
@@ -269,23 +302,27 @@ A total of **851 LOC**
 - Added `vdom` engine module
 - Moved game engine and its modules to its own folder
 - Removed engine dependency on fp lib
+- Removed state change notifications
+- Added sound loops
 
 ### TODO
 
-- [ ] Add mystery ship (100pts)
-- [ ] Change animation/collider API to prevent loading colliders before animations
-  - Decouple animations from colliders
+- [ ] Improve sounds balance
+
+## Roadmap
+
+### v0.8.0
+
 - [ ] Improve screen management
 - [ ] Add config menu with sounds volumne and custom key bindings
   - Volume off by default
   - Save user config in `localStorage`
 - [ ] Add high scores screen (needs server/firebase)
 
-## Roadmap
-
-### v0.8.0
+### v0.9.0
 
 - [ ] Add multiple stages increasing invaders velocity on each stage
+  - Create a `scene` module
   - Change scene init by using a matrix
 - [ ] Show credits when winning the game
 
@@ -293,34 +330,83 @@ A total of **851 LOC**
 
 ### Project
 
-- [ ] Replace relative imports with folder alias
 - [ ] Production build
+- [ ] Replace relative imports with folder alias
 - [ ] Use CSS modules
 - [ ] Rewrite with TypeScript
 
 ### Game
 
 - [ ] Quit current game from game pause menu
+- [ ] Improve menu navigation by using spacebar instead of escape to skip menu windows
 
 ### Engine
 
-- [ ] `mount` vtree when all sounds are loaded
-- [ ] Replace `keyboard.reset` with keypress events
-  - Improve keyboard bindings for menus
-- [ ] Export an `init` method with `mount` and `keyboard.listen()`
-- [ ] Hide shared state from engine modules with `init` wrappers
-- [ ] Decouple game loop from engine
+- [ ] Hide shared state from engine modules with `init` wrappers?
+  - This would allow to initialize the same module multiple times each one with its own state
+  - Useful for `scene` module?
 - [ ] Move game engine to its own repo
 - [ ] Add API documentation
+
+### Init
+
+- [ ] Create an `init` module?
+  - Calling `mount` and `keyboard.listen()`
+  - `mount` vtree when all sounds are loaded
+
+### Game loop
+
+- [ ] Decouple game loop from engine
+
+### Keyboard
+
+- [ ] Replace `keyboard.reset` with keypress events
+  - Improve keyboard bindings for menus
+
+### Sounds
+
+- [ ] Rename module to `audio`
+- [ ] Add functionality to pause/resume all sounds
+- [ ] Replace Ogg sounds with Web Audio API
+
+### Scene
+
+- [ ] Create a `scene` module?
+  - Background image
+  - Actors map
+  - Spawning actors
+
+### Menu
+
+- [ ] Create a `menu` module?
+- [ ] Add menu trees
+  - Menu trees can be bound to different scenes
+  - Menu trees can be reuse with different scenes
+  - Thinking about demo animations played in the background
+- [ ] Automatic run/stop animation/audio relative to menu state
+  - Such handling was previosly centralized in the deprecated `onStateChage`
+
+### Animation
+
+- [ ] Rename module
+  - Actor? Entity? Other?
+- [ ] Improve API to allow a simpler way to spawn actors
 
 ### Collider
 
 - [ ] Add `detect` method to separate collision detection and response
   - `detect` returs a collision or an array of collisions
   - `respond` is only called if collisions have been detected and receives the `detect` output
+- [ ] Improve animation/collider API to prevent loading colliders before animations
+- [ ] Improve collider API so a collider is declared as a collision between 2 actors
+  - Compare coordinates internally
+  - Handle arrays of actors of the same type
+  - Boundary actor functions or invisible actors outside the scene?
+  - Does this need to handle state by the engine? Is there a way to prevent it?
 
 ### Store
 
+- [ ] Add a 2nd callback to `setState` to execute side-effects once state has changed
 - [ ] State updates using `immerjs`
 - [ ] Partial component rendering
 - [ ] Add state selectors to `withState` HOC

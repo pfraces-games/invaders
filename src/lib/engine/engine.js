@@ -4,12 +4,13 @@ import {
   resetPressedKeys,
   listenKeyboard
 } from './keyboard';
-import { loadSound, playSound } from './sound';
+import { loadSound, playSound, pauseSound } from './sound';
 import {
   runAnimation,
   stopAnimation,
   addAnimation,
-  applyAnimations
+  applyAnimations,
+  resetAnimations
 } from './animation';
 import { addCollider } from './collider';
 import { patch } from './vdom';
@@ -24,13 +25,15 @@ export const keyboard = {
 
 export const sound = {
   load: loadSound,
-  play: playSound
+  play: playSound,
+  stop: pauseSound
 };
 
 export const animation = {
   run: runAnimation,
   stop: stopAnimation,
-  add: addAnimation
+  add: addAnimation,
+  reset: resetAnimations
 };
 
 export const collider = {

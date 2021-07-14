@@ -7,8 +7,16 @@ import { menuLayerComponent } from './menu-layer-component';
 const canvasComponent = function ({ state }) {
   const { cellSize, cols, rows } = settings.grid;
   const { fontSize } = settings.theme;
-  const { currentMenu, score, invaders, projectiles, explosions, defender } =
-    state;
+
+  const {
+    currentMenu,
+    score,
+    invaders,
+    projectiles,
+    explosions,
+    defender,
+    mysteryShip
+  } = state;
 
   return h(
     'div.canvas',
@@ -20,7 +28,13 @@ const canvasComponent = function ({ state }) {
       }
     },
     [
-      worldLayerComponent({ invaders, projectiles, explosions, defender }),
+      worldLayerComponent({
+        invaders,
+        projectiles,
+        explosions,
+        defender,
+        mysteryShip
+      }),
       statsLayerComponent({ score }),
       menuLayerComponent({ currentMenu })
     ]

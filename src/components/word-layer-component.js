@@ -5,6 +5,10 @@ const invaderComponent = function ({ type, x, y }) {
   return spriteComponent({ className: `invader-${type}`, x, y });
 };
 
+const mysteryShipComponent = function ({ x, y }) {
+  return spriteComponent({ className: 'mystery-ship', x, y });
+};
+
 const defenderComponent = function ({ x, y }) {
   return spriteComponent({ className: 'defender', x, y });
 };
@@ -21,12 +25,14 @@ export const worldLayerComponent = function ({
   invaders,
   projectiles,
   explosions,
-  defender
+  defender,
+  mysteryShip
 }) {
   return h('div.world-layer', [
     ...invaders.map(invaderComponent),
     ...projectiles.map(projectileComponent),
     ...explosions.map(explosionComponent),
-    defender && defenderComponent(defender)
+    defender && defenderComponent(defender),
+    mysteryShip && mysteryShipComponent(mysteryShip)
   ]);
 };
