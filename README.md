@@ -311,14 +311,21 @@ A total of **1029 LOC**
 
 - Add high scores menu
 
+### Product changelog
+
+- Fixed mystery ship sound stop on pause
+
 ### TODO
 
-- [ ] Improve screen management
 - [ ] Improve sounds balance
+- [ ] Replace `keyboard.reset` with keypress events
+  - Improve keyboard bindings for menus
+- [ ] Add high scores menu
+  - Improve menu management
+- [ ] Read/update high scores from server
 - [ ] Add config menu with sounds volumne and custom key bindings
   - Volume off by default
   - Save user config in `localStorage`
-- [ ] Add high scores screen (needs server/firebase)
 
 ## Roadmap
 
@@ -334,6 +341,7 @@ A total of **1029 LOC**
 ### Project
 
 - [ ] Production build
+- [ ] Import dependencies from a CDN to reduce total size
 - [ ] Replace relative imports with folder alias
 - [ ] Use CSS modules
 - [ ] Rewrite with TypeScript
@@ -345,6 +353,7 @@ A total of **1029 LOC**
 
 ### Engine
 
+- [ ] Add method to pause/resume both animation and sound
 - [ ] Hide shared state from engine modules with `init` wrappers?
   - This would allow to initialize the same module multiple times each one with its own state
   - Useful for `scene` module?
@@ -360,11 +369,6 @@ A total of **1029 LOC**
 ### Game loop
 
 - [ ] Decouple game loop from engine
-
-### Keyboard
-
-- [ ] Replace `keyboard.reset` with keypress events
-  - Improve keyboard bindings for menus
 
 ### Sounds
 
@@ -419,5 +423,13 @@ A total of **1029 LOC**
 ### Misc
 
 - [ ] Sprite smooth movement
+  - It cannot be made with CSS due to the different time intervals between CSS and the game loop
+  - Should animations be attached to an actor or group of actors?
+  - Animations `update` method should return a movement vector instead of a finite position
+  - Animations should replace `velocity` method with a `delta` parameter in the `update` method
+  - Animations velocity should be calculated inside the `update` method based on the `delta` param
+  - `update` returned vector should be an `{ x, y }` position object with decimal numbers
+  - `update` returned vector sould be added to the current position
+  - Updated position should be rounded to match a grid position
 - [ ] Sprite animations
 - [ ] Sprite groups

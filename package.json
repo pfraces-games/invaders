@@ -1,6 +1,6 @@
 {
   "name": "invaders",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Grid-based browser game inspired by Space Invaders",
   "scripts": {
     "start": "snowpack dev",
