@@ -1,4 +1,4 @@
-export const menu = {
+export const menuType = {
   none: 'none',
   controls: 'controls',
   pause: 'pause',

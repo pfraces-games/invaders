@@ -1,6 +1,6 @@
 import { h } from '../lib/engine/engine';
 import { constant } from '../lib/fp';
-import { menu } from '../model';
+import { menuType } from '../types';
 import { settings } from '../settings';
 
 const menuTitleComponent = function () {
@@ -54,26 +54,26 @@ const menuContentGameOverComponent = function () {
   ]);
 };
 
-export const menuLayerComponent = function ({ menuId }) {
-  if (menuId === menu.none) {
+export const menuLayerComponent = function ({ menu }) {
+  if (menu === menuType.none) {
     return null;
   }
 
   let menuContentComponent = constant(null);
 
-  if (menuId === menu.controls) {
+  if (menu === menuType.controls) {
     menuContentComponent = menuContentControlsComponent;
   }
 
-  if (menuId === menu.pause) {
+  if (menu === menuType.pause) {
     menuContentComponent = menuContentPauseComponent;
   }
 
-  if (menuId === menu.youwin) {
+  if (menu === menuType.youwin) {
     menuContentComponent = menuContentYouWinComponent;
   }
 
-  if (menuId === menu.gameover) {
+  if (menu === menuType.gameover) {
     menuContentComponent = menuContentGameOverComponent;
   }
 

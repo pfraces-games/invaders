@@ -321,7 +321,7 @@ A total of **1029 LOC**
 - [ ] Replace `keyboard.reset` with keypress events
   - Improve keyboard bindings for menus
 - [ ] Add high scores menu
-  - Improve menu management
+  - Improve screen management
 - [ ] Read/update high scores from server
 - [ ] Add config menu with sounds volumne and custom key bindings
   - Volume off by default

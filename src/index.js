@@ -7,7 +7,7 @@ import {
 } from './lib/engine/engine';
 import { store } from './lib/store';
 import { constant } from './lib/fp';
-import { menu, invaderType } from './model';
+import { menuType, invaderType } from './types';
 import { settings } from './settings';
 import { rootComponent } from './components/root-component';
 
@@ -51,7 +51,7 @@ const gameState = store(function () {
   const rowEnd = rows - 1;
 
   return {
-    menuId: menu.controls,
+    menu: menuType.controls,
     score: 0,
     defender: {
       x: Math.ceil(cols / 2) - 1,
@@ -87,7 +87,7 @@ const play = function () {
   setState(function (state) {
     return {
       ...state,
-      menuId: menu.none
+      menu: menuType.none
     };
   });
 };
@@ -100,7 +100,7 @@ const pause = function () {
   setState(function (state) {
     return {
       ...state,
-      menuId: menu.pause
+      menu: menuType.pause
     };
   });
 };
@@ -163,27 +163,27 @@ const fire = function () {
   });
 };
 
-const onMenu = function (id, action) {
+const onMenu = function (type, action) {
   return function () {
-    const idFound = getState(function ({ menuId }) {
-      return menuId === id;
+    const menuFound = getState(function ({ menu }) {
+      return menu === type;
     });
 
-    if (idFound) {
+    if (menuFound) {
       action();
     }
   };
 };
 
-keyboard.bind('ArrowLeft', onMenu(menu.none, moveDefenderLeft));
-keyboard.bind('ArrowRight', onMenu(menu.none, moveDefenderRight));
-keyboard.bind('Space', onMenu(menu.none, fire));
-keyboard.bind('Escape', onMenu(menu.none, pause));
+keyboard.bind('ArrowLeft', onMenu(menuType.none, moveDefenderLeft));
+keyboard.bind('ArrowRight', onMenu(menuType.none, moveDefenderRight));
+keyboard.bind('Space', onMenu(menuType.none, fire));
+keyboard.bind('Escape', onMenu(menuType.none, pause));
 
-keyboard.bind('Space', onMenu(menu.controls, play));
-keyboard.bind('Space', onMenu(menu.pause, play));
-keyboard.bind('Escape', onMenu(menu.youwin, reset));
-keyboard.bind('Escape', onMenu(menu.gameover, reset));
+keyboard.bind('Space', onMenu(menuType.controls, play));
+keyboard.bind('Space', onMenu(menuType.pause, play));
+keyboard.bind('Escape', onMenu(menuType.youwin, reset));
+keyboard.bind('Escape', onMenu(menuType.gameover, reset));
 
 // ------
 // Sounds
@@ -402,7 +402,7 @@ const invaderLandingCollider = {
     setState(function (state) {
       return {
         ...state,
-        menuId: menu.gameover,
+        menu: menuType.gameover,
         defender: null,
         mysteryShip: null
       };
@@ -458,15 +458,15 @@ const projectileHitsInvaderCollider = {
         });
       });
 
-      let menuId = state.menuId;
+      let menu = state.menu;
 
       if (!invaders.length) {
-        menuId = menu.youwin;
+        menu = menuType.youwin;
       }
 
       return {
         ...state,
-        menuId,
+        menu,
         score: state.score + scoreIncrement,
         projectiles,
         explosions: [...state.explosions, ...collisions],
