@@ -112,6 +112,7 @@ const resume = function () {
 const reset = function () {
   animation.reset();
   sound.reset();
+  keyboard.reset();
   resetState();
 };
 

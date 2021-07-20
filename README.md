@@ -315,6 +315,7 @@ A total of **1029 LOC**
 
 - Fixed mystery ship sound stop on pause
 - Improved keyboard bindings
+- Fixed keyboard reset on state reset
 
 ### Implementation changelog
 
