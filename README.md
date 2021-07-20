@@ -314,12 +314,16 @@ A total of **1029 LOC**
 ### Product changelog
 
 - Fixed mystery ship sound stop on pause
+- Improved keyboard bindings
+
+### Implementation changelog
+
+- Improved sound management
 
 ### TODO
 
+- [ ] Fix projectile/invader collissions on the last-but-one row
 - [ ] Improve sounds balance
-- [ ] Replace `keyboard.reset` with keypress events
-  - Improve keyboard bindings for menus
 - [ ] Add high scores menu
   - Improve screen management
 - [ ] Read/update high scores from server

@@ -43,14 +43,14 @@ const menuContentPauseComponent = function () {
 const menuContentYouWinComponent = function () {
   return h('div.menu-content', [
     h('p', 'YOU WIN!'),
-    h('p', 'Press ESCAPE to restart')
+    h('p', 'Press SPACEBAR to restart')
   ]);
 };
 
 const menuContentGameOverComponent = function () {
   return h('div.menu-content', [
     h('p', 'GAME OVER'),
-    h('p', 'Press ESCAPE to restart')
+    h('p', 'Press SPACEBAR to restart')
   ]);
 };
 

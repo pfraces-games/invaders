@@ -6,7 +6,7 @@ import {
   mount
 } from './lib/engine/engine';
 import { store } from './lib/store';
-import { constant } from './lib/fp';
+import { constant, partial } from './lib/fp';
 import { menuType, invaderType } from './types';
 import { settings } from './settings';
 import { rootComponent } from './components/root-component';
@@ -46,6 +46,17 @@ const initInvaders = function () {
   });
 };
 
+const setMenu = function (menu) {
+  keyboard.reset();
+
+  setState(function (state) {
+    return {
+      ...state,
+      menu
+    };
+  });
+};
+
 const gameState = store(function () {
   const { cols, rows } = settings.grid;
   const rowEnd = rows - 1;
@@ -68,47 +79,40 @@ const gameState = store(function () {
 
 const { getState, setState, resetState, withState } = gameState;
 
+// ------
+// Sounds
+// ------
+
+sound.add({ id: 'mysteryShip', url: './assets/mystery-ship.ogg', loop: true });
+sound.add({ id: 'invader', url: './assets/invader.ogg', volume: 0.3 });
+sound.add({ id: 'fire', url: './assets/fire.ogg' });
+sound.add({ id: 'explosion', url: './assets/explosion.ogg' });
+
 // ------------
 // Key Bindings
 // ------------
 
 const play = function () {
-  keyboard.reset();
   animation.run();
-
-  const isMysteryShipInScene = getState(function (state) {
-    return state.mysteryShip !== null;
-  });
-
-  if (isMysteryShipInScene) {
-    sound.play('mysteryShip');
-  }
-
-  setState(function (state) {
-    return {
-      ...state,
-      menu: menuType.none
-    };
-  });
+  setMenu(menuType.none);
 };
 
 const pause = function () {
-  keyboard.reset();
   animation.stop();
-  sound.stop('mysteryShip');
+  sound.pause();
+  setMenu(menuType.pause);
+};
 
-  setState(function (state) {
-    return {
-      ...state,
-      menu: menuType.pause
-    };
-  });
+const resume = function () {
+  animation.run();
+  sound.resume();
+  setMenu(menuType.none);
 };
 
 const reset = function () {
-  resetState();
-  keyboard.reset();
   animation.reset();
+  sound.reset();
+  resetState();
 };
 
 const moveDefenderLeft = function () {
@@ -163,36 +167,33 @@ const fire = function () {
   });
 };
 
-const onMenu = function (type, action) {
+const onMenu = function (type, listener) {
   return function () {
-    const menuFound = getState(function ({ menu }) {
+    const menuMatches = getState(function ({ menu }) {
       return menu === type;
     });
 
-    if (menuFound) {
-      action();
+    if (menuMatches) {
+      listener();
     }
   };
 };
 
-keyboard.bind('ArrowLeft', onMenu(menuType.none, moveDefenderLeft));
-keyboard.bind('ArrowRight', onMenu(menuType.none, moveDefenderRight));
-keyboard.bind('Space', onMenu(menuType.none, fire));
-keyboard.bind('Escape', onMenu(menuType.none, pause));
+const onScene = partial(onMenu, menuType.none);
+const onMenuControls = partial(onMenu, menuType.controls);
+const onMenuPause = partial(onMenu, menuType.pause);
+const onMenuYouwin = partial(onMenu, menuType.youwin);
+const onMenuGameover = partial(onMenu, menuType.gameover);
 
-keyboard.bind('Space', onMenu(menuType.controls, play));
-keyboard.bind('Space', onMenu(menuType.pause, play));
-keyboard.bind('Escape', onMenu(menuType.youwin, reset));
-keyboard.bind('Escape', onMenu(menuType.gameover, reset));
+keyboard.bind('ArrowLeft', onScene(moveDefenderLeft));
+keyboard.bind('ArrowRight', onScene(moveDefenderRight));
+keyboard.bind('Space', onScene(fire));
+keyboard.bind('Escape', onScene(pause));
 
-// ------
-// Sounds
-// ------
-
-sound.add({ id: 'mysteryShip', url: './assets/mystery-ship.ogg', loop: true });
-sound.add({ id: 'invader', url: './assets/invader.ogg', volume: 0.3 });
-sound.add({ id: 'fire', url: './assets/fire.ogg' });
-sound.add({ id: 'explosion', url: './assets/explosion.ogg' });
+keyboard.bind('Space', onMenuControls(play));
+keyboard.bind('Space', onMenuPause(resume));
+keyboard.bind('Space', onMenuYouwin(reset));
+keyboard.bind('Space', onMenuGameover(reset));
 
 // ----------
 // Animations
@@ -397,12 +398,12 @@ const invaderLandingCollider = {
     }
 
     animation.stop();
-    sound.stop('mysteryShip');
+    sound.pause('mysteryShip');
+    setMenu(menuType.gameover);
 
     setState(function (state) {
       return {
         ...state,
-        menu: menuType.gameover,
         defender: null,
         mysteryShip: null
       };
@@ -458,15 +459,8 @@ const projectileHitsInvaderCollider = {
         });
       });
 
-      let menu = state.menu;
-
-      if (!invaders.length) {
-        menu = menuType.youwin;
-      }
-
       return {
         ...state,
-        menu,
         score: state.score + scoreIncrement,
         projectiles,
         explosions: [...state.explosions, ...collisions],
@@ -474,12 +468,15 @@ const projectileHitsInvaderCollider = {
       };
     });
 
-    getState(function (state) {
-      if (!state.invaders.length) {
-        animation.stop();
-        sound.stop('mysteryShip');
-      }
+    const invadersLeft = getState(function (state) {
+      return state.invaders.length;
     });
+
+    if (!invadersLeft) {
+      animation.stop();
+      sound.pause('mysteryShip');
+      setMenu(menuType.youwin);
+    }
   }
 };
 
@@ -496,7 +493,7 @@ const mysteryShipOutOfBoundsCollider = {
       return;
     }
 
-    sound.stop('mysteryShip');
+    sound.pause('mysteryShip');
 
     setState(function (state) {
       return {
@@ -524,7 +521,7 @@ const projectileHitsMysteryShipCollider = {
       return;
     }
 
-    sound.stop('mysteryShip');
+    sound.pause('mysteryShip');
     sound.play('explosion');
     const scoreIncrement = settings.score.mysteryShip;
 

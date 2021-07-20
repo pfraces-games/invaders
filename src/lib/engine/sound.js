@@ -17,7 +17,32 @@ export const playSound = function (id) {
   sound.play();
 };
 
-export const stopSound = function (id) {
-  const sound = sounds[id];
-  sound.pause();
+export const pauseSound = function (...args) {
+  const ids = args.length ? args : Object.keys(sounds);
+
+  ids.forEach(function (id) {
+    const sound = sounds[id];
+    sound.pause();
+  });
+};
+
+export const resumeSound = function (...args) {
+  const ids = args.length ? args : Object.keys(sounds);
+
+  ids.forEach(function (id) {
+    const sound = sounds[id];
+    console.log({ id, currentTime: sound.currentTime });
+
+    if (sound.currentTime > 0 && !sound.ended) {
+      sound.play();
+    }
+  });
+};
+
+export const resetSound = function () {
+  Object.keys(sounds).forEach(function (id) {
+    const sound = sounds[id];
+    sound.currentTime = 0;
+    sound.pause();
+  });
 };

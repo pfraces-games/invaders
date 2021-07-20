@@ -27,10 +27,10 @@ export const resetPressedKeys = function () {
 };
 
 export const listenKeyboard = function () {
-  document.addEventListener('keydown', function ({ code }) {
+  document.addEventListener('keydown', function ({ code, repeat }) {
     const index = pressedKeys.indexOf(code);
 
-    if (index === -1) {
+    if (index === -1 && !repeat) {
       pressedKeys.push(code);
     }
   });
